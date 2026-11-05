@@ -19,7 +19,8 @@ namespace CapaPresentacion.Helpers
         // Mientras no esté en esta lista, el menú lo muestra como "pronto".
         private static readonly HashSet<string> Listos = new HashSet<string>
         {
-            "Home/Index"
+            "Home/Index",
+            "TiposHabitacion/Index"
         };
 
         public static List<ItemMenu> Para(string rol)

@@ -54,6 +54,7 @@
     <Compile Include="Hasher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SesionUsuario.cs" />
+    <Compile Include="TipoHabitacionNegocio.cs" />
     <Compile Include="UsuarioNegocio.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -44,7 +44,13 @@
                 </div>
             }
         </aside>
+
         <main class="main">
+            @if (TempData["Ok"] != null)
+            {
+                <div class="ok">@TempData["Ok"]</div>
+            }
+
             @if (TempData["Aviso"] != null)
             {
                 <div class="error">@TempData["Aviso"]</div>

@@ -1,0 +1,35 @@
+﻿@model CapaPresentacion.ViewModels.TipoHabitacionViewModel
+@{
+    bool nuevo = Model.IdTipoHabitacion == 0;
+    ViewBag.Titulo = nuevo ? "Nuevo tipo" : "Editar tipo";
+}
+<h1>@(nuevo ? "Nuevo tipo de habitación." : "Editar tipo de habitación.")</h1>
+<p class="sub">Los campos con * son obligatorios.</p>
+
+<div class="card form">
+    @using (Html.BeginForm("Guardar", "TiposHabitacion", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.IdTipoHabitacion)
+        @Html.ValidationSummary(true)
+
+        @Html.LabelFor(m => m.NombreTipo)
+        @Html.TextBoxFor(m => m.NombreTipo, new { @class = "inp", maxlength = 40, autofocus = "autofocus" })
+        @Html.ValidationMessageFor(m => m.NombreTipo)
+
+        @Html.LabelFor(m => m.Capacidad)
+        @Html.TextBoxFor(m => m.Capacidad, new { @class = "inp", type = "number", min = 1, max = 10 })
+        @Html.ValidationMessageFor(m => m.Capacidad)
+
+        @Html.LabelFor(m => m.Descripcion)
+        @Html.TextAreaFor(m => m.Descripcion, 3, 40, new { @class = "inp" })
+        @Html.ValidationMessageFor(m => m.Descripcion)
+
+        <label class="check">@Html.CheckBoxFor(m => m.Estado) Activo</label>
+
+        <div class="botones">
+            <button type="submit" class="btn-p">Guardar</button>
+            <a class="btn-s" href="@Url.Action("Index")">Cancelar</a>
+        </div>
+    }
+</div>
