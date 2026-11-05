@@ -225,3 +225,124 @@ label {
             font-size: 34px
         }
 }
+
+/* ---------- Estructura de la aplicación ---------- */
+.app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh
+}
+
+.side {
+    background: var(--verde-osc);
+    color: #dbe7e2;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    height: 100vh
+}
+
+    .side .logo {
+        margin-bottom: 24px
+    }
+
+.lbl {
+    font-size: 11px;
+    letter-spacing: .14em;
+    color: #a9c2b9;
+    margin: 8px 10px;
+    font-weight: 600
+}
+
+.side nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+    .side nav a, .side nav .pronto {
+        padding: 11px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #dbe7e2;
+        text-decoration: none
+    }
+
+        .side nav a:hover {
+            background: #244b40
+        }
+
+        .side nav a.on {
+            background: #2a5a4c;
+            color: #fff
+        }
+
+    .side nav .pronto {
+        color: #8fa89f;
+        cursor: default;
+        display: flex;
+        justify-content: space-between;
+        align-items: center
+    }
+
+.pronto em {
+    font-style: normal;
+    font-size: 11px;
+    border: 1px solid #5b7a70;
+    border-radius: 999px;
+    padding: 1px 8px
+}
+
+.who {
+    margin-top: auto;
+    font-size: 13px;
+    color: #a9c2b9;
+    padding: 12px 10px 0;
+    border-top: 1px solid #2a5a4c
+}
+
+    .who strong {
+        color: #fff;
+        display: block
+    }
+
+    .who a {
+        color: #e0b878;
+        text-decoration: none
+    }
+
+.main {
+    padding: 32px 40px;
+    max-width: 1180px;
+    width: 100%
+}
+
+    .main h1 {
+        font: 400 32px Georgia,serif;
+        margin: 0 0 4px
+    }
+
+.card {
+    background: #fff;
+    border: 1px solid var(--linea);
+    border-radius: 12px;
+    padding: 20px
+}
+
+@media(max-width:860px) {
+    .app {
+        grid-template-columns: 1fr
+    }
+
+    .side {
+        position: static;
+        height: auto
+    }
+
+    .main {
+        padding: 20px 16px
+    }
+}

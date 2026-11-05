@@ -1,25 +1,10 @@
 ﻿@{
-    Layout = null;
+    ViewBag.Titulo = "Inicio";
     var s = (CapaNegocio.SesionUsuario)ViewBag.Sesion;
 }
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Las Terrazas</title>
-    <link href="~/Content/hotel.css" rel="stylesheet" />
-</head>
-<body>
-    <main class="panel-prueba">
-        <h1>Hola, @s.NombreMostrar</h1>
-        <p>Rol: <strong>@s.Rol</strong></p>
-        @if (TempData["Aviso"] != null)
-        {
-            <div class="error">@TempData["Aviso"]</div>
-        }
-        <p>El login funciona. Este panel es temporal.</p>
-        <a class="btn-main" href="@Url.Action("Logout", "Cuenta")">Cerrar sesión</a>
-    </main>
-</body>
-</html>
+<h1>Hola, @s.NombreMostrar</h1>
+<p class="sub">Sesión iniciada como @s.Rol.</p>
+
+<div class="card">
+    El panel con indicadores de tu rol aparecerá aquí cuando terminemos los módulos.
+</div>
