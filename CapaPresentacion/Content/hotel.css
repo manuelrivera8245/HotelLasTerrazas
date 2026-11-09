@@ -494,3 +494,12 @@ label {
     background: #f6ead3;
     color: #6b4a12
 }
+
+.warn {
+    background: #f6ead3;
+    color: #6b4a12;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin: 0 0 12px
+}

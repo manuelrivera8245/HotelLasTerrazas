@@ -19,7 +19,8 @@ namespace CapaPresentacion.Helpers
         {
             "Home/Index",
             "TiposHabitacion/Index",
-            "Habitaciones/Index"
+            "Habitaciones/Index",
+            "Temporadas/Index"
         };
 
         public static List<ItemMenu> Para(string rol)

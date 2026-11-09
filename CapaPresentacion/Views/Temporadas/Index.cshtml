@@ -1,0 +1,51 @@
+﻿@model List<CapaNegocio.TemporadaFila>
+@{
+    ViewBag.Titulo = "Temporadas";
+    var huecos = (List<CapaNegocio.HuecoFechas>)ViewBag.Huecos;
+}
+<div class="cabecera">
+    <div>
+        <h1>Temporadas.</h1>
+        <p class="sub">Define el calendario de tarifas: alta, baja, feriados. Las fechas no pueden cruzarse.</p>
+    </div>
+    <a class="btn-p" href="@Url.Action("Crear")">+ Nueva temporada</a>
+</div>
+
+@foreach (var h in huecos)
+{
+    <div class="warn">
+        Sin temporada del <strong>@h.Desde.ToString("dd/MM/yyyy")</strong> al <strong>@h.Hasta.ToString("dd/MM/yyyy")</strong>:
+        en esas fechas no se puede reservar.
+    </div>
+}
+
+<div class="card tabla">
+    <table>
+        <thead>
+            <tr><th>TEMPORADA</th><th>INICIO</th><th>FIN</th><th>DÍAS</th><th>TARIFAS</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                bool completa = t.TiposActivos > 0 && t.TarifasCargadas >= t.TiposActivos;
+                <tr>
+                    <td><strong>@t.NombreTemporada</strong></td>
+                    <td>@t.FechaInicio.ToString("dd/MM/yyyy")</td>
+                    <td>@t.FechaFin.ToString("dd/MM/yyyy")</td>
+                    <td>@t.Dias</td>
+                    <td><span class="pill @(completa ? "p-ok" : "p-amb")">@t.TarifasCargadas / @t.TiposActivos</span></td>
+                    <td class="acciones">
+                        <a class="btn-s" href="@Url.Action("Editar", new { id = t.IdTemporada })">Editar</a>
+                        @using (Html.BeginForm("Eliminar", "Temporadas", FormMethod.Post,
+                            new { style = "display:inline", onsubmit = "return confirm('¿Eliminar esta temporada? También se eliminarán sus tarifas.');" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@t.IdTemporada" />
+                            <button type="submit" class="btn-s peligro">Eliminar</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
