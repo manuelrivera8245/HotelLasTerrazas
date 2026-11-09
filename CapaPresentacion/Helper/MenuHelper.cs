@@ -15,12 +15,11 @@ namespace CapaPresentacion.Helpers
 
     public static class MenuHelper
     {
-        // Cada vez que termines un módulo, agrega aquí su "Controlador/Accion".
-        // Mientras no esté en esta lista, el menú lo muestra como "pronto".
         private static readonly HashSet<string> Listos = new HashSet<string>
         {
             "Home/Index",
-            "TiposHabitacion/Index"
+            "TiposHabitacion/Index",
+            "Habitaciones/Index"
         };
 
         public static List<ItemMenu> Para(string rol)

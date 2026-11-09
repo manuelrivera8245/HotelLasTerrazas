@@ -484,3 +484,13 @@ label {
     gap: 10px;
     margin-top: 24px
 }
+
+.p-azul {
+    background: #dbe7f0;
+    color: #1f4a66
+}
+
+.p-amb {
+    background: #f6ead3;
+    color: #6b4a12
+}

@@ -128,6 +128,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\CuentaController.cs" />
+    <Compile Include="Controllers\HabitacionesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TiposHabitacionController.cs" />
     <Compile Include="Filters\AutorizarRolAttribute.cs" />
@@ -136,6 +137,7 @@
     </Compile>
     <Compile Include="Helper\MenuHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\HabitacionViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\TipoHabitacionViewModel.cs" />
   </ItemGroup>
@@ -193,6 +195,8 @@
     <Content Include="Views\Cuenta\Login.cshtml" />
     <Content Include="Views\TiposHabitacion\Index.cshtml" />
     <Content Include="Views\TiposHabitacion\Formulario.cshtml" />
+    <Content Include="Views\Habitaciones\Index.cshtml" />
+    <Content Include="Views\Habitaciones\Formulario.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

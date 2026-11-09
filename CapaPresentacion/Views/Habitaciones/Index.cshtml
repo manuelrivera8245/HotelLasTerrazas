@@ -1,0 +1,44 @@
+﻿@model List<CapaNegocio.HabitacionFila>
+@{
+    ViewBag.Titulo = "Habitaciones";
+}
+<div class="cabecera">
+    <div>
+        <h1>Habitaciones.</h1>
+        <p class="sub">Catálogo físico del hotel: número, piso, tipo y estado actual.</p>
+    </div>
+    <a class="btn-p" href="@Url.Action("Crear")">+ Nueva habitación</a>
+</div>
+
+<div class="card tabla">
+    <table>
+        <thead>
+            <tr><th>N°</th><th>PISO</th><th>TIPO</th><th>CAPACIDAD</th><th>ESTADO</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Model)
+            {
+                string clase = h.Estado == "Disponible" ? "p-ok"
+                             : h.Estado == "Ocupada" ? "p-azul"
+                             : h.Estado == "Mantenimiento" ? "p-amb" : "p-off";
+                <tr>
+                    <td><strong>@h.NumeroHabitacion</strong></td>
+                    <td>@h.Piso</td>
+                    <td>@h.NombreTipo</td>
+                    <td>@h.Capacidad</td>
+                    <td><span class="pill @clase">@h.Estado</span></td>
+                    <td class="acciones">
+                        <a class="btn-s" href="@Url.Action("Editar", new { id = h.IdHabitacion })">Editar</a>
+                        @using (Html.BeginForm("Eliminar", "Habitaciones", FormMethod.Post,
+                            new { style = "display:inline", onsubmit = "return confirm('¿Eliminar esta habitación?');" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@h.IdHabitacion" />
+                            <button type="submit" class="btn-s peligro">Eliminar</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
