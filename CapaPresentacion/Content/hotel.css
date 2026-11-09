@@ -503,3 +503,23 @@ label {
     font-size: 14px;
     margin: 0 0 12px
 }
+
+.matriz th {
+    vertical-align: bottom;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: 0
+}
+
+    .matriz th .fechas {
+        display: block;
+        font-weight: 400;
+        font-size: 12px;
+        color: var(--suave);
+        margin: 2px 0 8px
+    }
+
+.matriz td.precio {
+    font-weight: 600;
+    white-space: nowrap
+}
