@@ -1,0 +1,63 @@
+﻿@model List<CapaNegocio.ReservaFila>
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Mis reservas";
+    var inv = CultureInfo.InvariantCulture;
+}
+<div class="cabecera">
+    <div>
+        <h1>Mis reservas.</h1>
+        <p class="sub">Historial de tus estadías. Aquí solo ves tus propias reservas.</p>
+    </div>
+    <a class="btn-p" href="@Url.Action("Buscar")">+ Nueva reserva</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card">Todavía no tienes reservas. Empieza buscando una habitación.</div>
+}
+else
+{
+    <div class="card tabla">
+        <table>
+            <thead>
+                <tr><th>N°</th><th>FECHAS</th><th>HABITACIONES</th><th>TOTAL</th><th>ESTADO</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    string clase = r.Estado == "Pendiente" ? "p-amb"
+                                 : r.Estado == "Confirmada" ? "p-ok"
+                                 : r.Estado == "CheckIn" ? "p-azul"
+                                 : r.Estado == "Cancelada" ? "p-rojo" : "p-off";
+                    <tr>
+                        <td><strong>#@r.IdReserva.ToString("D6")</strong></td>
+                        <td>@r.Entrada.ToString("dd/MM/yyyy") – @r.Salida.ToString("dd/MM/yyyy")<br /><small>@r.Noches noche(s)</small></td>
+                        <td>@r.Habitaciones</td>
+                        <td>S/ @r.Total.ToString("N2", inv)</td>
+                        <td>
+                            <span class="pill @clase">@r.Estado</span>
+                            @if (r.Pagada)
+                            {
+                                <span class="pill p-ok">Pagada</span>
+                            }
+                        </td>
+                        <td class="acciones">
+                            <a class="btn-s" href="@Url.Action("Confirmacion", new { id = r.IdReserva })">Ver</a>
+                            @if (r.PuedeCancelar)
+                            {
+                                using (Html.BeginForm("Cancelar", "Reserva", FormMethod.Post,
+                                    new { style = "display:inline", onsubmit = "return confirm('¿Cancelar esta reserva?');" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.IdReserva" />
+                                    <button type="submit" class="btn-s peligro">Cancelar</button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

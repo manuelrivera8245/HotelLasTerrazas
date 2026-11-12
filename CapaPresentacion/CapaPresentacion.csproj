@@ -223,6 +223,8 @@
     <Content Include="Views\Tarifas\Editar.cshtml" />
     <Content Include="Views\Reserva\Buscar.cshtml" />
     <Content Include="Views\Reserva\Resumen.cshtml" />
+    <Content Include="Views\Reserva\Confirmacion.cshtml" />
+    <Content Include="Views\Reserva\MisReservas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

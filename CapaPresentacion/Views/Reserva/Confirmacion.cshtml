@@ -1,0 +1,46 @@
+﻿@model CapaNegocio.ReservaDetalleCliente
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Reserva registrada";
+    var inv = CultureInfo.InvariantCulture;
+}
+<div class="exito">
+    <svg width="56" height="56" viewBox="0 0 56 56" role="img" aria-label="Reserva registrada">
+        <circle cx="28" cy="28" r="28" fill="#28594b" />
+        <path d="M16 29l8 8 16-17" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <h1>Reserva registrada.</h1>
+    <p class="sub">Tu reserva quedó <span class="pill p-amb">@Model.Estado</span> hasta que recepción la confirme.</p>
+</div>
+
+<div class="card" style="max-width:720px">
+    <div class="fila-res"><span>N° de reserva</span><strong>#@Model.IdReserva.ToString("D6")</strong></div>
+    <div class="fila-res"><span>Entrada</span><strong>@Model.Entrada.ToString("dd/MM/yyyy")</strong></div>
+    <div class="fila-res"><span>Salida</span><strong>@Model.Salida.ToString("dd/MM/yyyy")</strong></div>
+    <div class="fila-res"><span>Noches</span><strong>@Model.Noches</strong></div>
+</div>
+
+<div class="card tabla" style="max-width:720px;margin-top:16px">
+    <table>
+        <thead>
+            <tr><th>HABITACIÓN</th><th>TIPO</th><th>POR NOCHE</th><th>SUBTOTAL</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var l in Model.Lineas)
+            {
+                <tr>
+                    <td><strong>@l.NumeroHabitacion</strong></td>
+                    <td>@l.NombreTipo</td>
+                    <td>S/ @l.PrecioNoche.ToString("N2", inv)</td>
+                    <td>S/ @l.Subtotal.ToString("N2", inv)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="total-res">Total <strong>S/ @Model.Total.ToString("N2", inv)</strong></div>
+</div>
+
+<div class="botones">
+    <a class="btn-p" href="@Url.Action("MisReservas")">Ver mis reservas</a>
+    <a class="btn-s" href="@Url.Action("Buscar")">Nueva búsqueda</a>
+</div>

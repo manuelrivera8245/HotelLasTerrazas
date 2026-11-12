@@ -104,7 +104,6 @@
 @section scripts {
     <script>
 (function () {
-    // Que la salida nunca sea anterior o igual a la entrada
     var ent = document.getElementById('entrada'), sal = document.getElementById('salida');
     function masUnDia(v) {
         var d = new Date(v + 'T00:00:00');
@@ -119,7 +118,6 @@
         if (!sal.value || sal.value < min) sal.value = min;
     });
 
-    // Barra flotante: cantidad de habitaciones y total
     var form = document.getElementById('formSeleccion');
     if (!form) return;
     var noches = parseInt(form.getAttribute('data-noches'), 10);

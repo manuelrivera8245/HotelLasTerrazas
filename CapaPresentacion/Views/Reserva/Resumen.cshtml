@@ -34,7 +34,31 @@
     <div class="total-res">Total <strong>S/ @Model.Total.ToString("N2", inv)</strong></div>
 </div>
 
-<div class="botones">
-    <a class="btn-s" href="@Url.Action("Buscar", new { entrada = Model.Entrada.ToString("yyyy-MM-dd"), salida = Model.Salida.ToString("yyyy-MM-dd"), idTipo = ViewBag.IdTipo })">← Cambiar selección</a>
-</div>
-<p class="sub" style="margin-top:16px">El botón para confirmar y registrar la reserva se agrega en el siguiente paso.</p>
+@using (Html.BeginForm("Confirmar", "Reserva", FormMethod.Post, new { id = "formConfirmar" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="entrada" value="@Model.Entrada.ToString("yyyy-MM-dd")" />
+    <input type="hidden" name="salida" value="@Model.Salida.ToString("yyyy-MM-dd")" />
+    <input type="hidden" name="idTipo" value="@ViewBag.IdTipo" />
+    foreach (var l in Model.Lineas)
+    {
+        <input type="hidden" name="habitaciones" value="@l.IdHabitacion" />
+    }
+    <div class="botones">
+        <button type="submit" id="btnConfirmar" class="btn-p">Confirmar reserva</button>
+        <a class="btn-s" href="@Url.Action("Buscar", new { entrada = Model.Entrada.ToString("yyyy-MM-dd"), salida = Model.Salida.ToString("yyyy-MM-dd"), idTipo = ViewBag.IdTipo })">← Cambiar selección</a>
+    </div>
+}
+
+@section scripts {
+    <script>
+            const form = document.getElementById('formConfirmar');
+            const boton = document.getElementById('btnConfirmar');
+            if (form && boton) {
+                form.addEventListener('submit', function () {
+                    boton.setAttribute('disabled', 'disabled');
+                    boton.textContent = 'Registrando…';
+                });
+            }
+    </script>
+}
