@@ -1,0 +1,151 @@
+﻿@model CapaPresentacion.ViewModels.BuscarViewModel
+@using System.Globalization
+@using CapaPresentacion.Helpers
+@{
+    ViewBag.Titulo = "Nueva reserva";
+    var r = Model.Resultado;
+    var inv = CultureInfo.InvariantCulture;
+    string hoy = DateTime.Today.ToString("yyyy-MM-dd");
+}
+<h1>Encuentra tu habitación.</h1>
+<p class="sub">Elige tus fechas y selecciona una o varias habitaciones.</p>
+
+<div class="card">
+    <form method="get" action="@Url.Action("Buscar")" class="buscador">
+        <div>
+            <label for="entrada">Entrada</label>
+            <input class="inp" type="date" id="entrada" name="entrada" min="@hoy" required
+                   value="@(Model.Entrada.HasValue ? Model.Entrada.Value.ToString("yyyy-MM-dd") : "")" />
+        </div>
+        <div>
+            <label for="salida">Salida</label>
+            <input class="inp" type="date" id="salida" name="salida" min="@hoy" required
+                   value="@(Model.Salida.HasValue ? Model.Salida.Value.ToString("yyyy-MM-dd") : "")" />
+        </div>
+        <div>
+            <label for="idTipo">Tipo de habitación</label>
+            <select class="inp" id="idTipo" name="idTipo">
+                <option value="">Todos los tipos</option>
+                @foreach (var t in Model.Tipos)
+                {
+                    <option value="@t.Id" @(Model.IdTipo == t.Id ? "selected" : "")>@t.Texto</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn-p">Consultar disponibilidad</button>
+    </form>
+</div>
+
+@if (r != null)
+{
+    if (r.Error != null)
+    {
+        <div class="warn" style="margin-top:20px">@r.Error</div>
+    }
+    else if (r.Habitaciones.Count == 0)
+    {
+        <div class="card" style="margin-top:20px">
+            No hay habitaciones disponibles del @r.Entrada.ToString("dd/MM/yyyy") al @r.Salida.ToString("dd/MM/yyyy")
+            con ese filtro. Prueba con otras fechas u otro tipo de habitación.
+        </div>
+    }
+    else
+    {
+        <p class="res-info">
+            <strong>@r.Habitaciones.Count habitación(es) disponible(s)</strong>
+            · @r.NombreTemporada · @r.Noches noche(s)
+        </p>
+
+        <form id="formSeleccion" method="post" action="@Url.Action("Resumen")" data-noches="@r.Noches">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="entrada" value="@r.Entrada.ToString("yyyy-MM-dd")" />
+            <input type="hidden" name="salida" value="@r.Salida.ToString("yyyy-MM-dd")" />
+            <input type="hidden" name="idTipo" value="@Model.IdTipo" />
+
+            <div class="rooms">
+                @foreach (var h in r.Habitaciones)
+                {
+                    string foto = FotoHelper.Habitacion(h.NombreTipo);
+                    <label class="room-card">
+                        <input type="checkbox" name="habitaciones" value="@h.IdHabitacion"
+                               data-precio="@h.PrecioNoche.ToString("0.00", inv)" />
+                        <div class="room-foto">
+                            @if (foto != null)
+                            {
+                                <img src="@foto" alt="Habitación @h.NombreTipo" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="room-sin-foto">@h.NumeroHabitacion</div>
+                            }
+                            <span class="room-num">@h.NumeroHabitacion</span>
+                            <span class="room-check" aria-hidden="true"></span>
+                        </div>
+                        <div class="room-info">
+                            <strong>@h.NombreTipo · @h.NumeroHabitacion</strong>
+                            <span>Hasta @h.Capacidad huésped(es) · Piso @h.Piso</span>
+                            <div class="room-precio">S/ @h.PrecioNoche.ToString("N2", inv) <small>/ noche</small></div>
+                        </div>
+                    </label>
+                }
+            </div>
+
+            <div class="barra">
+                <div>
+                    <small id="barCant">0 habitaciones · @r.Noches noche(s)</small>
+                    <b id="barTotal">S/ 0.00</b>
+                </div>
+                <button type="submit" id="barBtn" class="btn-dor" disabled>Ver resumen →</button>
+            </div>
+        </form>
+    }
+}
+
+@section scripts {
+    <script>
+(function () {
+    // Que la salida nunca sea anterior o igual a la entrada
+    var ent = document.getElementById('entrada'), sal = document.getElementById('salida');
+    function masUnDia(v) {
+        var d = new Date(v + 'T00:00:00');
+        d.setDate(d.getDate() + 1);
+        return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    }
+    if (ent.value) sal.min = masUnDia(ent.value);
+    ent.addEventListener('change', function () {
+        if (!ent.value) return;
+        var min = masUnDia(ent.value);
+        sal.min = min;
+        if (!sal.value || sal.value < min) sal.value = min;
+    });
+
+    // Barra flotante: cantidad de habitaciones y total
+    var form = document.getElementById('formSeleccion');
+    if (!form) return;
+    var noches = parseInt(form.getAttribute('data-noches'), 10);
+    var checks = form.querySelectorAll('input[name="habitaciones"]');
+    var cant = document.getElementById('barCant');
+    var total = document.getElementById('barTotal');
+    var btn = document.getElementById('barBtn');
+
+    function actualizar() {
+        var n = 0, suma = 0;
+        for (var i = 0; i < checks.length; i++) {
+            var card = checks[i].closest('.room-card');
+            if (checks[i].checked) {
+                n++;
+                suma += parseFloat(checks[i].getAttribute('data-precio'));
+                card.classList.add('sel');
+            } else {
+                card.classList.remove('sel');
+            }
+        }
+        cant.textContent = n + (n === 1 ? ' habitación' : ' habitaciones') + ' · ' + noches + (noches === 1 ? ' noche' : ' noches');
+        total.textContent = 'S/ ' + (suma * noches).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        btn.disabled = n === 0;
+    }
+    for (var i = 0; i < checks.length; i++) checks[i].addEventListener('change', actualizar);
+    actualizar();
+})();
+    </script>
+}

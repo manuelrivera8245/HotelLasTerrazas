@@ -1,0 +1,40 @@
+﻿@model CapaNegocio.Cotizacion
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Resumen de reserva";
+    var inv = CultureInfo.InvariantCulture;
+}
+<h1>Resumen de tu reserva.</h1>
+<p class="sub">Revisa los datos antes de confirmar.</p>
+
+<div class="card" style="max-width:720px">
+    <div class="fila-res"><span>Entrada</span><strong>@Model.Entrada.ToString("dd/MM/yyyy")</strong></div>
+    <div class="fila-res"><span>Salida</span><strong>@Model.Salida.ToString("dd/MM/yyyy")</strong></div>
+    <div class="fila-res"><span>Noches</span><strong>@Model.Noches</strong></div>
+    <div class="fila-res"><span>Temporada</span><strong>@Model.NombreTemporada</strong></div>
+</div>
+
+<div class="card tabla" style="max-width:720px;margin-top:16px">
+    <table>
+        <thead>
+            <tr><th>HABITACIÓN</th><th>TIPO</th><th>POR NOCHE</th><th>SUBTOTAL</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var l in Model.Lineas)
+            {
+                <tr>
+                    <td><strong>@l.NumeroHabitacion</strong></td>
+                    <td>@l.NombreTipo</td>
+                    <td>S/ @l.PrecioNoche.ToString("N2", inv)</td>
+                    <td>S/ @l.Subtotal.ToString("N2", inv)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="total-res">Total <strong>S/ @Model.Total.ToString("N2", inv)</strong></div>
+</div>
+
+<div class="botones">
+    <a class="btn-s" href="@Url.Action("Buscar", new { entrada = Model.Entrada.ToString("yyyy-MM-dd"), salida = Model.Salida.ToString("yyyy-MM-dd"), idTipo = ViewBag.IdTipo })">← Cambiar selección</a>
+</div>
+<p class="sub" style="margin-top:16px">El botón para confirmar y registrar la reserva se agrega en el siguiente paso.</p>
