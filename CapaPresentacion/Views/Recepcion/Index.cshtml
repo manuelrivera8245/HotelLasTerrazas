@@ -1,0 +1,99 @@
+﻿@model CapaPresentacion.ViewModels.ReservasRecepcionViewModel
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Reservas";
+    var inv = CultureInfo.InvariantCulture;
+    string fechaTxt = Model.Fecha.HasValue ? Model.Fecha.Value.ToString("yyyy-MM-dd") : null;
+}
+<div class="cabecera">
+    <div>
+        <h1>Reservas.</h1>
+        <p class="sub">Confirma reservas, registra la llegada y la salida de los huéspedes y gestiona cancelaciones.</p>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+    <form method="get" action="@Url.Action("Index")" class="filtros">
+        <div>
+            <label for="estado">Estado</label>
+            <select class="inp" id="estado" name="estado">
+                <option value="">Todos</option>
+                @foreach (var e in Model.Estados)
+                {
+                    <option value="@e" @(Model.Estado == e ? "selected" : "")>@e</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label for="fecha">Estadía en la fecha</label>
+            <input class="inp" type="date" id="fecha" name="fecha" value="@fechaTxt" />
+        </div>
+        <button type="submit" class="btn-p">Filtrar</button>
+        <a class="btn-s" href="@Url.Action("Index")">Limpiar</a>
+    </form>
+</div>
+
+@if (Model.Filas.Count == 0)
+{
+    <div class="card">No hay reservas con ese filtro.</div>
+}
+else
+{
+    <div class="card tabla">
+        <table>
+            <thead>
+                <tr><th>N°</th><th>CLIENTE</th><th>FECHAS</th><th>HAB.</th><th>TOTAL</th><th>ESTADO</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var f in Model.Filas)
+                {
+                    string clase = f.Estado == "Pendiente" ? "p-amb"
+                                 : f.Estado == "Confirmada" ? "p-ok"
+                                 : f.Estado == "CheckIn" ? "p-azul"
+                                 : f.Estado == "Cancelada" ? "p-rojo" : "p-off";
+                    string accion = f.PuedeConfirmar ? "Confirmar" : f.PuedeCheckIn ? "CheckIn" : f.PuedeCheckOut ? "CheckOut" : null;
+                    string texto = f.PuedeConfirmar ? "Confirmar" : f.PuedeCheckIn ? "Check-in" : "Check-out";
+                    string pregunta = f.PuedeConfirmar ? "¿Confirmar la reserva N° " + f.IdReserva + "?"
+                                    : f.PuedeCheckIn ? "¿Registrar el check-in de la reserva N° " + f.IdReserva + "?"
+                                    : "¿Registrar el check-out de la reserva N° " + f.IdReserva + "?";
+                    <tr>
+                        <td><strong>#@f.IdReserva.ToString("D6")</strong></td>
+                        <td>@f.Cliente<br /><small>@f.Documento</small></td>
+                        <td>@f.Entrada.ToString("dd/MM/yyyy") – @f.Salida.ToString("dd/MM/yyyy")<br /><small>@f.Noches noche(s)</small></td>
+                        <td>@f.Habitaciones</td>
+                        <td>S/ @f.Total.ToString("N2", inv)</td>
+                        <td>
+                            <span class="pill @clase">@f.Estado</span>
+                            @if (f.Pagada)
+                            {
+                                <span class="pill p-ok">Pagada</span>
+                            }
+                        </td>
+                        <td class="acciones">
+                            @if (accion != null)
+                            {
+                                using (Html.BeginForm(accion, "Recepcion", FormMethod.Post,
+                                    new { style = "display:inline", onsubmit = "return confirm('" + pregunta + "');" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@f.IdReserva" />
+                                    <input type="hidden" name="estado" value="@Model.Estado" />
+                                    <input type="hidden" name="fecha" value="@fechaTxt" />
+                                    <button type="submit" class="btn-s prim">@texto</button>
+                                }
+                            }
+                            @if (f.PuedeCancelar)
+                            {
+                                <a class="btn-s peligro" href="@Url.Action("Cancelar", new { id = f.IdReserva, estado = Model.Estado, fecha = fechaTxt })">Cancelar</a>
+                            }
+                            @if (f.Nota != null)
+                            {
+                                <span class="nota">@f.Nota</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

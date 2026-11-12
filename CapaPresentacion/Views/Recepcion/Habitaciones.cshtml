@@ -1,0 +1,40 @@
+﻿@model List<CapaNegocio.HabitacionEstadoFila>
+@{
+    ViewBag.Titulo = "Habitaciones";
+}
+<h1>Habitaciones.</h1>
+<p class="sub">Estado actual de cada habitación. Tras un check-out pasa a Limpieza hasta que la marques como lista.</p>
+
+<div class="card tabla">
+    <table>
+        <thead>
+            <tr><th>N°</th><th>PISO</th><th>TIPO</th><th>ESTADO</th><th>DETALLE</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Model)
+            {
+                string clase = h.Estado == "Disponible" ? "p-ok"
+                             : h.Estado == "Ocupada" ? "p-azul"
+                             : h.Estado == "Mantenimiento" ? "p-amb" : "p-off";
+                <tr>
+                    <td><strong>@h.Numero</strong></td>
+                    <td>@h.Piso</td>
+                    <td>@h.Tipo</td>
+                    <td><span class="pill @clase">@h.Estado</span></td>
+                    <td>@h.Detalle</td>
+                    <td class="acciones">
+                        @if (h.PuedeMarcarLista)
+                        {
+                            using (Html.BeginForm("MarcarLista", "Recepcion", FormMethod.Post, new { style = "display:inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@h.IdHabitacion" />
+                                <button type="submit" class="btn-s prim">Marcar lista</button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
