@@ -25,7 +25,8 @@ namespace CapaPresentacion.Helpers
             "Reserva/Buscar",
             "Reserva/MisReservas",
             "Recepcion/Index",
-            "Recepcion/Habitaciones"
+            "Recepcion/Habitaciones",
+            "Recepcion/Pagos"
         };
 
         public static List<ItemMenu> Para(string rol)

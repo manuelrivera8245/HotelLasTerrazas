@@ -44,6 +44,10 @@ else
                         </td>
                         <td class="acciones">
                             <a class="btn-s" href="@Url.Action("Confirmacion", new { id = r.IdReserva })">Ver</a>
+                            @if (r.Pagada)
+                            {
+                                <a class="btn-s" href="@Url.Action("Constancia", new { id = r.IdReserva })">Constancia</a>
+                            }
                             @if (r.PuedeCancelar)
                             {
                                 using (Html.BeginForm("Cancelar", "Reserva", FormMethod.Post,

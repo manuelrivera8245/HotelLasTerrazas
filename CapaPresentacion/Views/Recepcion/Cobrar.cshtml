@@ -1,0 +1,48 @@
+﻿@model CapaPresentacion.ViewModels.CobroViewModel
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Cobrar reserva";
+    var inv = CultureInfo.InvariantCulture;
+}
+<h1>Registrar pago.</h1>
+<p class="sub">Pago total de la reserva. La serie y el número del comprobante se asignan solos.</p>
+
+<div class="card form">
+    <div class="fila-res"><span>Reserva</span><strong>#@Model.IdReserva.ToString("D6") · @Model.EstadoReserva</strong></div>
+    <div class="fila-res"><span>Cliente</span><strong>@Model.Cliente (@Model.Documento)</strong></div>
+    <div class="fila-res"><span>Fechas</span><strong>@Model.Fechas</strong></div>
+    <div class="fila-res"><span>Habitaciones</span><strong>@Model.Habitaciones</strong></div>
+    <div class="total-res" style="padding-left:0;padding-right:0">Total a cobrar <strong>S/ @Model.Total.ToString("N2", inv)</strong></div>
+
+    @if (Model.Bloqueo != null)
+    {
+        <div class="warn">@Model.Bloqueo</div>
+        <div class="botones">
+            <a class="btn-s" href="@Url.Action("Index", new { estado = Model.FiltroEstado, fecha = Model.FiltroFecha })">Volver a reservas</a>
+        </div>
+    }
+    else
+    {
+        using (Html.BeginForm("Cobrar", "Recepcion", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.IdReserva)
+            @Html.HiddenFor(m => m.FiltroEstado)
+            @Html.HiddenFor(m => m.FiltroFecha)
+            @Html.ValidationSummary(true)
+
+            @Html.LabelFor(m => m.IdMetodoPago)
+            @Html.DropDownListFor(m => m.IdMetodoPago, Model.Metodos, new { @class = "inp" })
+            @Html.ValidationMessageFor(m => m.IdMetodoPago)
+
+            @Html.LabelFor(m => m.IdTipoComprobante)
+            @Html.DropDownListFor(m => m.IdTipoComprobante, Model.Tipos, new { @class = "inp" })
+            @Html.ValidationMessageFor(m => m.IdTipoComprobante)
+
+            <div class="botones">
+                <button type="submit" class="btn-p">Registrar pago y emitir comprobante</button>
+                <a class="btn-s" href="@Url.Action("Index", new { estado = Model.FiltroEstado, fecha = Model.FiltroFecha })">Cancelar</a>
+            </div>
+        }
+    }
+</div>

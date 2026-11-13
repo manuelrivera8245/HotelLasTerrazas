@@ -115,8 +115,8 @@ namespace CapaNegocio
                     Estado = d.Estado,
                     Total = d.MontoTotal,
                     Pagada = d.Pagada,
-                    PuedeCancelar = d.IdEstadoReserva == EstadoReservaId.Pendiente
-                                 || d.IdEstadoReserva == EstadoReservaId.Confirmada
+                    PuedeCancelar = (d.IdEstadoReserva == EstadoReservaId.Pendiente
+                                 || d.IdEstadoReserva == EstadoReservaId.Confirmada) && !d.Pagada
                 }).ToList();
             }
         }
@@ -182,6 +182,9 @@ namespace CapaNegocio
 
                 if (r.IdEstadoReserva != EstadoReservaId.Pendiente && r.IdEstadoReserva != EstadoReservaId.Confirmada)
                     return "Solo se pueden cancelar reservas Pendientes o Confirmadas.";
+
+                if (db.Pago.Any(p => p.IdReserva == idReserva))
+                    return "Esta reserva ya fue pagada y no se puede cancelar desde aquí. Comunícate con el hotel.";
 
                 try
                 {

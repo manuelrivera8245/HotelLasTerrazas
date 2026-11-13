@@ -14,6 +14,8 @@ namespace CapaPresentacion.Controllers
     {
         private readonly ReservaNegocio negocio = new ReservaNegocio();
         private readonly ReservaClienteNegocio clienteNegocio = new ReservaClienteNegocio();
+
+        private readonly PagoNegocio pagos = new PagoNegocio();
         private readonly HabitacionNegocio habNegocio = new HabitacionNegocio();
 
         private int IdCliente
@@ -91,6 +93,14 @@ namespace CapaPresentacion.Controllers
         public ActionResult MisReservas()
         {
             return View(clienteNegocio.MisReservas(IdCliente));
+        }
+
+        [HttpGet]
+        public ActionResult Constancia(int id)
+        {
+            var d = pagos.ObtenerPorReserva(id, IdCliente);
+            if (d == null) return HttpNotFound();
+            return View(d);
         }
 
         [HttpPost]

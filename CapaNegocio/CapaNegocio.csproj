@@ -54,6 +54,7 @@
     <Compile Include="Constantes.cs" />
     <Compile Include="HabitacionNegocio.cs" />
     <Compile Include="Hasher.cs" />
+    <Compile Include="PagoNegocio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecepcionNegocio.cs" />
     <Compile Include="ReservaClienteNegocio.cs" />

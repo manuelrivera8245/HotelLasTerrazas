@@ -145,6 +145,7 @@
     <Compile Include="ViewModels\BuscarViewModel.cs" />
     <Compile Include="ViewModels\HabitacionViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
+    <Compile Include="ViewModels\PagoViewModels.cs" />
     <Compile Include="ViewModels\RecepcionViewModels.cs" />
     <Compile Include="ViewModels\TarifasTemporadaViewModel.cs" />
     <Compile Include="ViewModels\TemporadaViewModel.cs" />
@@ -230,6 +231,11 @@
     <Content Include="Views\Recepcion\Index.cshtml" />
     <Content Include="Views\Recepcion\Cancelar.cshtml" />
     <Content Include="Views\Recepcion\Habitaciones.cshtml" />
+    <Content Include="Views\Shared\_Constancia.cshtml" />
+    <Content Include="Views\Recepcion\Comprobante.cshtml" />
+    <Content Include="Views\Reserva\Constancia.cshtml" />
+    <Content Include="Views\Recepcion\Cobrar.cshtml" />
+    <Content Include="Views\Recepcion\Pagos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

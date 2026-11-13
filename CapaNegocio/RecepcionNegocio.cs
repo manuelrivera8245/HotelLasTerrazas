@@ -27,6 +27,8 @@ namespace CapaNegocio
         public bool PuedeCheckOut { get; set; }
         public bool PuedeCancelar { get; set; }
         public string Nota { get; set; }
+        public bool PuedeCobrar { get; set; }
+        public int? IdPago { get; set; }
     }
 
     public class HabitacionEstadoFila
@@ -122,6 +124,11 @@ namespace CapaNegocio
 
         public string CheckOut(int id)
         {
+            using (var db = new HotelContext())
+            {
+                if (!db.Pago.Any(p => p.IdReserva == id))
+                    return "No se puede hacer check-out sin registrar el pago. Cobra la reserva primero.";
+            }
             return EjecutarSp("sp_CheckOut", id);
         }
 
@@ -130,6 +137,12 @@ namespace CapaNegocio
             motivo = (motivo ?? "").Trim();
             if (motivo.Length == 0) return "Indica el motivo de la cancelación.";
             if (motivo.Length > 200) return "El motivo admite máximo 200 caracteres.";
+
+            using (var db0 = new HotelContext())
+            {
+                if (db0.Pago.Any(p => p.IdReserva == id))
+                    return "No se puede cancelar: la reserva ya tiene un pago registrado.";
+            }
 
             try
             {
@@ -223,7 +236,8 @@ namespace CapaNegocio
                 r.IdEstadoReserva,
                 Estado = r.EstadoReserva.NombreEstado,
                 Habs = r.DetalleReserva.Select(d => d.Habitacion.NumeroHabitacion),
-                Pagada = r.Pago.Any()
+                Pagada = r.Pago.Any(),
+                IdPago = r.Pago.Select(p => (int?)p.IdPago).FirstOrDefault()
             }).ToList();
 
             DateTime hoy = DateTime.Today;
@@ -251,10 +265,12 @@ namespace CapaNegocio
                     Estado = d.Estado,
                     Total = d.MontoTotal,
                     Pagada = d.Pagada,
+                    IdPago = d.IdPago,
+                    PuedeCobrar = !d.Pagada && (confirmada || d.IdEstadoReserva == EstadoReservaId.CheckIn),
                     PuedeConfirmar = d.IdEstadoReserva == EstadoReservaId.Pendiente,
                     PuedeCheckIn = confirmada && hoy >= d.FechaEntrada.Date && hoy < d.FechaSalida.Date,
                     PuedeCheckOut = d.IdEstadoReserva == EstadoReservaId.CheckIn,
-                    PuedeCancelar = d.IdEstadoReserva == EstadoReservaId.Pendiente || confirmada,
+                    PuedeCancelar = (d.IdEstadoReserva == EstadoReservaId.Pendiente || confirmada) && !d.Pagada,
                     Nota = nota
                 };
             }).ToList();

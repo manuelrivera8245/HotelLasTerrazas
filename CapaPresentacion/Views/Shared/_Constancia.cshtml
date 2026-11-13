@@ -1,0 +1,46 @@
+﻿@model CapaNegocio.ComprobanteDetalle
+@using System.Globalization
+@{
+    var inv = CultureInfo.InvariantCulture;
+}
+<div class="constancia">
+    <div class="const-cab">
+        <div class="logo-c">LT<span><b>LAS TERRAZAS</b><small>HOTEL · AREQUIPA</small></span></div>
+        <div class="const-tipo">
+            <strong>@Model.Tipo.ToUpper()</strong>
+            <span>@(Model.Serie + "-" + Model.Numero)</span>
+        </div>
+    </div>
+
+    <div class="fila-res"><span>Fecha de emisión</span><strong>@Model.FechaEmision.ToString("dd/MM/yyyy HH:mm")</strong></div>
+    <div class="fila-res"><span>Cliente</span><strong>@Model.Cliente</strong></div>
+    <div class="fila-res"><span>Documento</span><strong>@Model.TipoDocumento @Model.Documento</strong></div>
+    <div class="fila-res"><span>Reserva</span><strong>#@Model.IdReserva.ToString("D6")</strong></div>
+    <div class="fila-res"><span>Estadía</span><strong>@Model.Entrada.ToString("dd/MM/yyyy") – @Model.Salida.ToString("dd/MM/yyyy") (@Model.Noches noche(s))</strong></div>
+
+    <div class="tabla" style="margin-top:16px">
+        <table>
+            <thead>
+                <tr><th>HABITACIÓN</th><th>TIPO</th><th>NOCHES</th><th>POR NOCHE</th><th>SUBTOTAL</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var l in Model.Lineas)
+                {
+                    <tr>
+                        <td><strong>@l.NumeroHabitacion</strong></td>
+                        <td>@l.NombreTipo</td>
+                        <td>@Model.Noches</td>
+                        <td>S/ @l.PrecioNoche.ToString("N2", inv)</td>
+                        <td>S/ @l.Subtotal.ToString("N2", inv)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="total-res" style="padding-left:0;padding-right:0">Total pagado <strong>S/ @Model.Monto.ToString("N2", inv)</strong></div>
+    <div class="fila-res"><span>Método de pago</span><strong>@Model.Metodo</strong></div>
+    <div class="fila-res"><span>Fecha de pago</span><strong>@Model.FechaPago.ToString("dd/MM/yyyy HH:mm")</strong></div>
+
+    <p class="const-nota">Comprobante referencial generado por el sistema de un proyecto académico. No tiene validez tributaria.</p>
+</div>

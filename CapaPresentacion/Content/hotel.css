@@ -809,3 +809,93 @@ label {
     margin-top: 6px;
     white-space: normal
 }
+
+/* ---------- Comprobante ---------- */
+.constancia {
+    max-width: 720px;
+    background: #fff;
+    border: 1px solid var(--linea);
+    border-radius: 12px;
+    padding: 28px
+}
+
+.const-cab {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    border-bottom: 2px solid var(--verde);
+    padding-bottom: 16px;
+    margin-bottom: 12px
+}
+
+.logo-c {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font: 400 30px Georgia,serif;
+    color: var(--verde)
+}
+
+    .logo-c b {
+        display: block;
+        font: 600 13px "Segoe UI",sans-serif;
+        letter-spacing: .14em;
+        color: var(--ink)
+    }
+
+    .logo-c small {
+        display: block;
+        font: 600 10px "Segoe UI",sans-serif;
+        letter-spacing: .16em;
+        color: var(--suave)
+    }
+
+.const-tipo {
+    text-align: right;
+    border: 2px solid var(--verde);
+    border-radius: 8px;
+    padding: 8px 14px
+}
+
+    .const-tipo strong {
+        display: block;
+        letter-spacing: .1em;
+        font-size: 13px;
+        color: var(--verde)
+    }
+
+    .const-tipo span {
+        font: 600 18px "Segoe UI",sans-serif
+    }
+
+.const-nota {
+    font-size: 12px;
+    color: var(--suave);
+    margin: 16px 0 0
+}
+
+@media print {
+    .side, .no-print, .ok, .error {
+        display: none !important
+    }
+
+    .app {
+        display: block !important
+    }
+
+    .main {
+        padding: 0 !important;
+        max-width: none !important
+    }
+
+    body {
+        background: #fff
+    }
+
+    .constancia {
+        border: 0;
+        padding: 0;
+        max-width: none
+    }
+}

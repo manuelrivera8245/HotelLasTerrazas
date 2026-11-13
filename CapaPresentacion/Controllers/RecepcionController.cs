@@ -14,6 +14,8 @@ namespace CapaPresentacion.Controllers
     {
         private readonly RecepcionNegocio negocio = new RecepcionNegocio();
 
+        private readonly PagoNegocio pagos = new PagoNegocio();
+
         [HttpGet]
         public ActionResult Index(string estado, DateTime? fecha)
         {
@@ -100,6 +102,56 @@ namespace CapaPresentacion.Controllers
             return RedirectToAction("Habitaciones");
         }
 
+        [HttpGet]
+        public ActionResult Cobrar(int id, string estado, string fecha)
+        {
+            var m = new CobroViewModel { IdReserva = id, FiltroEstado = estado, FiltroFecha = fecha };
+            if (!CompletarCobro(m)) return HttpNotFound();
+
+            m.IdMetodoPago = m.Metodos.Any() ? int.Parse(m.Metodos.First().Value) : 0;
+            m.IdTipoComprobante = m.Tipos.Any() ? int.Parse(m.Tipos.First().Value) : 0;
+            return View(m);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Cobrar(CobroViewModel m)
+        {
+            if (!CompletarCobro(m)) return HttpNotFound();
+            if (m.Bloqueo != null || !ModelState.IsValid) return View(m);
+
+            var r = pagos.Registrar(m.IdReserva, m.IdMetodoPago, m.IdTipoComprobante);
+            if (r.Error != null)
+            {
+                ModelState.AddModelError("", r.Error);
+                return View(m);
+            }
+
+            TempData["Ok"] = "Pago registrado y comprobante emitido.";
+            return RedirectToAction("Comprobante", new { id = r.IdPago });
+        }
+
+        [HttpGet]
+        public ActionResult Comprobante(int id)
+        {
+            var d = pagos.Obtener(id, null);
+            if (d == null) return HttpNotFound();
+            return View(d);
+        }
+
+        [HttpGet]
+        public ActionResult Pagos(DateTime? desde, DateTime? hasta, int? idMetodo)
+        {
+            return View(new PagosViewModel
+            {
+                Desde = desde,
+                Hasta = hasta,
+                IdMetodo = idMetodo,
+                Metodos = pagos.Metodos(),
+                Historial = pagos.Historial(desde, hasta, idMetodo)
+            });
+        }
+
 
         private ActionResult VistaCancelar(CancelarRecepcionViewModel m)
         {
@@ -126,6 +178,24 @@ namespace CapaPresentacion.Controllers
                 estado = string.IsNullOrEmpty(estado) ? null : estado,
                 fecha = string.IsNullOrEmpty(fecha) ? null : fecha
             });
+        }
+
+        private bool CompletarCobro(CobroViewModel m)
+        {
+            var info = pagos.ParaCobrar(m.IdReserva);
+            if (info == null) return false;
+
+            m.Cliente = info.Cliente;
+            m.Documento = info.Documento;
+            m.Fechas = info.Entrada.ToString("dd/MM/yyyy") + " – " + info.Salida.ToString("dd/MM/yyyy");
+            m.Habitaciones = info.Habitaciones;
+            m.EstadoReserva = info.Estado;
+            m.Total = info.Total;
+            m.Bloqueo = info.Bloqueo;
+
+            m.Metodos = pagos.Metodos().Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Texto });
+            m.Tipos = pagos.Tipos().Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Texto });
+            return true;
         }
     }
 }

@@ -1,0 +1,64 @@
+﻿@model CapaPresentacion.ViewModels.PagosViewModel
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Pagos";
+    var inv = CultureInfo.InvariantCulture;
+    var h = Model.Historial;
+}
+<h1>Pagos y comprobantes.</h1>
+<p class="sub">Historial de cobros y comprobantes emitidos.</p>
+
+<div class="card" style="margin-bottom:16px">
+    <form method="get" action="@Url.Action("Pagos")" class="filtros">
+        <div>
+            <label for="desde">Desde</label>
+            <input class="inp" type="date" id="desde" name="desde" value="@(Model.Desde.HasValue ? Model.Desde.Value.ToString("yyyy-MM-dd") : "")" />
+        </div>
+        <div>
+            <label for="hasta">Hasta</label>
+            <input class="inp" type="date" id="hasta" name="hasta" value="@(Model.Hasta.HasValue ? Model.Hasta.Value.ToString("yyyy-MM-dd") : "")" />
+        </div>
+        <div>
+            <label for="idMetodo">Método de pago</label>
+            <select class="inp" id="idMetodo" name="idMetodo">
+                <option value="">Todos</option>
+                @foreach (var m in Model.Metodos)
+                {
+                    <option value="@m.Id" @(Model.IdMetodo == m.Id ? "selected" : "")>@m.Texto</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn-p">Filtrar</button>
+        <a class="btn-s" href="@Url.Action("Pagos")">Limpiar</a>
+    </form>
+</div>
+
+@if (h.Filas.Count == 0)
+{
+    <div class="card">No hay pagos con ese filtro.</div>
+}
+else
+{
+    <div class="card tabla">
+        <table>
+            <thead>
+                <tr><th>FECHA</th><th>COMPROBANTE</th><th>RESERVA</th><th>CLIENTE</th><th>MÉTODO</th><th>MONTO</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var f in h.Filas)
+                {
+                    <tr>
+                        <td>@f.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td><strong>@f.Comprobante</strong><br /><small>@f.Tipo</small></td>
+                        <td>#@f.IdReserva.ToString("D6")</td>
+                        <td>@f.Cliente</td>
+                        <td>@f.Metodo</td>
+                        <td>S/ @f.Monto.ToString("N2", inv)</td>
+                        <td class="acciones"><a class="btn-s" href="@Url.Action("Comprobante", new { id = f.IdPago })">Ver</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="total-res">@h.Filas.Count pago(s) · Total <strong>S/ @h.Total.ToString("N2", inv)</strong></div>
+    </div>
+}
