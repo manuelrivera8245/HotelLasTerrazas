@@ -55,8 +55,10 @@
     <Compile Include="HabitacionNegocio.cs" />
     <Compile Include="Hasher.cs" />
     <Compile Include="PagoNegocio.cs" />
+    <Compile Include="PanelNegocio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecepcionNegocio.cs" />
+    <Compile Include="ReportesNegocio.cs" />
     <Compile Include="ReservaClienteNegocio.cs" />
     <Compile Include="ReservaNegocio.cs" />
     <Compile Include="SesionUsuario.cs" />

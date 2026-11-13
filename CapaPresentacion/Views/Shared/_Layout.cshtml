@@ -26,7 +26,7 @@
                 {
                     if (it.Listo)
                     {
-                        bool activo = it.Controlador == ctl && it.Accion == act;
+                        bool activo = it.Controlador == ctl && (it.Accion == act || ctl == "Reportes");
                         <a class="@(activo ? "on" : "")" href="@Url.Action(it.Accion, it.Controlador)">@it.Texto</a>
                     }
                     else

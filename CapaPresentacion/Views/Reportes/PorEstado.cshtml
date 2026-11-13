@@ -1,0 +1,98 @@
+﻿@model CapaNegocio.ReporteEstados
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Reservas por estado";
+    var inv = CultureInfo.InvariantCulture;
+    string d1 = Model.Desde.ToString("yyyy-MM-dd");
+    string h1 = Model.Hasta.ToString("yyyy-MM-dd");
+}
+<div class="cabecera">
+    <div>
+        <h1>Reservas por estado.</h1>
+        <p class="sub">Reservas con entrada del @Model.Desde.ToString("dd/MM/yyyy") al @Model.Hasta.ToString("dd/MM/yyyy").</p>
+    </div>
+    <a class="btn-s no-print" href="@Url.Action("Index")">← Reportes</a>
+</div>
+
+<div class="card no-print" style="margin-bottom:16px">
+    <form method="get" action="@Url.Action("PorEstado")" class="filtros">
+        <div>
+            <label for="desde">Entrada desde</label>
+            <input class="inp" type="date" id="desde" name="desde" value="@d1" />
+        </div>
+        <div>
+            <label for="hasta">Entrada hasta</label>
+            <input class="inp" type="date" id="hasta" name="hasta" value="@h1" />
+        </div>
+        <div>
+            <label for="estado">Estado</label>
+            <select class="inp" id="estado" name="estado">
+                <option value="">Todos</option>
+                @foreach (var e in Model.Estados)
+                {
+                    <option value="@e" @(Model.Estado == e ? "selected" : "")>@e</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn-p">Generar</button>
+        <button type="button" class="btn-s" onclick="window.print()">Imprimir / PDF</button>
+    </form>
+</div>
+
+@if (Model.Error != null)
+{
+    <div class="warn">@Model.Error</div>
+}
+else
+{
+    <div class="chips">
+        <a class="chip @(string.IsNullOrEmpty(Model.Estado) ? "on" : "")" href="@Url.Action("PorEstado", new { desde = d1, hasta = h1 })">
+            <b>@Model.TotalReservas</b><small>Todas</small>
+        </a>
+        @foreach (var r in Model.Resumen)
+        {
+            <a class="chip @(Model.Estado == r.Estado ? "on" : "")" href="@Url.Action("PorEstado", new { desde = d1, hasta = h1, estado = r.Estado })">
+                <b>@r.Cantidad</b><small>@r.Estado · S/ @r.Monto.ToString("N2", inv)</small>
+            </a>
+        }
+    </div>
+
+    if (Model.Filas.Count == 0)
+    {
+        <div class="card">No hay reservas con ese filtro.</div>
+    }
+    else
+    {
+        <div class="card tabla">
+            <table>
+                <thead>
+                    <tr><th>N°</th><th>CLIENTE</th><th>FECHAS</th><th>HAB.</th><th>TOTAL</th><th>ESTADO</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var f in Model.Filas)
+                    {
+                        string clase = f.Estado == "Pendiente" ? "p-amb"
+                                     : f.Estado == "Confirmada" ? "p-ok"
+                                     : f.Estado == "CheckIn" ? "p-azul"
+                                     : f.Estado == "Cancelada" ? "p-rojo" : "p-off";
+                        <tr>
+                            <td><strong>#@f.IdReserva.ToString("D6")</strong></td>
+                            <td>@f.Cliente</td>
+                            <td>@f.Entrada.ToString("dd/MM/yyyy") – @f.Salida.ToString("dd/MM/yyyy")<br /><small>@f.Noches noche(s)</small></td>
+                            <td>@f.Habitaciones</td>
+                            <td>S/ @f.Total.ToString("N2", inv)</td>
+                            <td>
+                                <span class="pill @clase">@f.Estado</span>
+                                @if (f.Pagada)
+                                {
+                                    <span class="pill p-ok">Pagada</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    <p class="nota-rep">El rango se aplica a la fecha de entrada de cada reserva. Los montos por estado suman el total de las reservas, estén o no pagadas.</p>
+}

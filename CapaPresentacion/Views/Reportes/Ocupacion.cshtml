@@ -1,0 +1,69 @@
+﻿@model CapaNegocio.ReporteOcupacion
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Reporte de ocupación";
+    var inv = CultureInfo.InvariantCulture;
+}
+<div class="cabecera">
+    <div>
+        <h1>Ocupación.</h1>
+        <p class="sub">Del @Model.Desde.ToString("dd/MM/yyyy") al @Model.Hasta.ToString("dd/MM/yyyy"), por habitación.</p>
+    </div>
+    <a class="btn-s no-print" href="@Url.Action("Index")">← Reportes</a>
+</div>
+
+<div class="card no-print" style="margin-bottom:16px">
+    <form method="get" action="@Url.Action("Ocupacion")" class="filtros">
+        <div>
+            <label for="desde">Desde</label>
+            <input class="inp" type="date" id="desde" name="desde" value="@Model.Desde.ToString("yyyy-MM-dd")" />
+        </div>
+        <div>
+            <label for="hasta">Hasta</label>
+            <input class="inp" type="date" id="hasta" name="hasta" value="@Model.Hasta.ToString("yyyy-MM-dd")" />
+        </div>
+        <button type="submit" class="btn-p">Generar</button>
+        <button type="button" class="btn-s" onclick="window.print()">Imprimir / PDF</button>
+    </form>
+</div>
+
+@if (Model.Error != null)
+{
+    <div class="warn">@Model.Error</div>
+}
+else
+{
+    <div class="kpis">
+        <div class="card kpi"><small>Ocupación del hotel</small><b>@Model.Porcentaje.ToString("0.0", inv)%</b></div>
+        <div class="card kpi"><small>Noches ocupadas</small><b>@Model.NochesOcupadas</b><span>de @Model.NochesDisponibles disponibles</span></div>
+        <div class="card kpi"><small>Período</small><b>@Model.Dias</b><span>día(s) · @Model.Habitaciones habitaciones</span></div>
+    </div>
+
+    <div class="card tabla">
+        <table>
+            <thead>
+                <tr><th>HABITACIÓN</th><th>PISO</th><th>TIPO</th><th>NOCHES OCUPADAS</th><th>OCUPACIÓN</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var f in Model.Filas)
+                {
+                    int w = (int)Math.Round((double)f.Porcentaje);
+                    if (w > 100) { w = 100; }
+                    <tr>
+                        <td><strong>@f.Numero</strong></td>
+                        <td>@f.Piso</td>
+                        <td>@f.Tipo</td>
+                        <td>@f.NochesOcupadas de @Model.Dias</td>
+                        <td>
+                            <div class="celda-barra">
+                                <div class="pbar"><i style="width:@(w)%"></i></div>
+                                <span>@f.Porcentaje.ToString("0.0", inv)%</span>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="nota-rep">Cuenta las reservas Confirmadas, con check-in y con check-out. Las Pendientes y las Canceladas no cuentan.</p>
+}

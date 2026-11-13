@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Titulo = "Reportes";
+}
+<h1>Reportes.</h1>
+<p class="sub">Información del hotel por rango de fechas. Puedes imprimir cada reporte o guardarlo como PDF.</p>
+
+<div class="hub">
+    <div class="card">
+        <h2>Ocupación</h2>
+        <p class="sub">Noches ocupadas de cada habitación y porcentaje de ocupación del hotel.</p>
+        <a class="btn-p" href="@Url.Action("Ocupacion")">Ver reporte</a>
+    </div>
+    <div class="card">
+        <h2>Ingresos</h2>
+        <p class="sub">Total cobrado, por método de pago y por día.</p>
+        <a class="btn-p" href="@Url.Action("Ingresos")">Ver reporte</a>
+    </div>
+    <div class="card">
+        <h2>Reservas por estado</h2>
+        <p class="sub">Cuántas reservas hay en cada estado y el detalle de cada una.</p>
+        <a class="btn-p" href="@Url.Action("PorEstado")">Ver reporte</a>
+    </div>
+</div>

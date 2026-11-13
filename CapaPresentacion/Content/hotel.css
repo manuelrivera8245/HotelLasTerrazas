@@ -899,3 +899,127 @@ label {
         max-width: none
     }
 }
+
+/* ---------- Indicadores y reportes ---------- */
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 16px;
+    margin: 20px 0
+}
+
+.kpi {
+    padding: 16px 18px
+}
+
+    .kpi small {
+        display: block;
+        color: var(--suave);
+        font-size: 13px
+    }
+
+    .kpi b {
+        display: block;
+        font: 400 30px Georgia,serif;
+        margin-top: 6px;
+        color: var(--ink)
+    }
+
+    .kpi span {
+        display: block;
+        font-size: 12px;
+        color: var(--suave);
+        margin-top: 2px
+    }
+
+.dos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start
+}
+
+.hub {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 16px
+}
+
+    .hub h2 {
+        font: 400 24px Georgia,serif;
+        margin: 0 0 6px
+    }
+
+.chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 16px
+}
+
+.chip {
+    background: #fff;
+    border: 1px solid var(--linea);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 130px;
+    color: var(--ink);
+    text-decoration: none
+}
+
+    .chip b {
+        display: block;
+        font: 400 26px Georgia,serif
+    }
+
+    .chip small {
+        color: var(--suave);
+        font-size: 12px
+    }
+
+a.chip:hover {
+    border-color: var(--verde)
+}
+
+.chip.on {
+    border-color: var(--verde);
+    background: #eef3f0
+}
+
+.pbar {
+    height: 10px;
+    border-radius: 5px;
+    background: #e8ece9;
+    overflow: hidden;
+    min-width: 110px;
+    flex: 1
+}
+
+    .pbar i {
+        display: block;
+        height: 100%;
+        background: var(--verde)
+    }
+
+.celda-barra {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+    .celda-barra span {
+        min-width: 48px;
+        font-size: 13px
+    }
+
+.nota-rep {
+    font-size: 12px;
+    color: var(--suave);
+    margin: 12px 0 0
+}
+
+@media(max-width:860px) {
+    .dos {
+        grid-template-columns: 1fr
+    }
+}

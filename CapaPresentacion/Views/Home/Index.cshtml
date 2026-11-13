@@ -1,10 +1,168 @@
-﻿@{
+﻿@model CapaPresentacion.ViewModels.PanelViewModel
+@using System.Globalization
+@{
     ViewBag.Titulo = "Inicio";
-    var s = (CapaNegocio.SesionUsuario)ViewBag.Sesion;
+    var inv = CultureInfo.InvariantCulture;
+    var es = new CultureInfo("es-PE");
+    string fecha = Model.Hoy.ToString("dddd d 'de' MMMM 'de' yyyy", es);
+    string hoyTxt = Model.Hoy.ToString("yyyy-MM-dd");
 }
-<h1>Hola, @s.NombreMostrar</h1>
-<p class="sub">Sesión iniciada como @s.Rol.</p>
+<h1>Hola, @Model.Sesion.NombreMostrar.</h1>
+<p class="sub">@fecha · sesión como @Model.Sesion.Rol</p>
 
-<div class="card">
-    El panel con indicadores de tu rol aparecerá aquí cuando terminemos los módulos.
-</div>
+@if (Model.Admin != null)
+{
+    var a = Model.Admin;
+
+    if (a.TarifasFaltan > 0)
+    {
+        <div class="warn">
+            Faltan <strong>@a.TarifasFaltan</strong> tarifa(s): esos tipos no se pueden reservar en esas temporadas.
+            <a href="@Url.Action("Index", "Tarifas")">Completar tarifas →</a>
+        </div>
+    }
+    if (a.HuecosTemporada > 0)
+    {
+        <div class="warn">
+            Hay fechas sin temporada: en ellas no se puede reservar.
+            <a href="@Url.Action("Index", "Temporadas")">Revisar temporadas →</a>
+        </div>
+    }
+
+    <div class="kpis">
+        <div class="card kpi"><small>Habitaciones disponibles</small><b>@a.Habitaciones.Disponibles / @a.Habitaciones.Total</b></div>
+        <div class="card kpi"><small>Llegadas de hoy</small><b>@a.LlegadasHoy</b></div>
+        <div class="card kpi"><small>Reservas por confirmar</small><b>@a.Pendientes</b></div>
+        <div class="card kpi"><small>Ocupación de hoy</small><b>@a.OcupacionHoy.ToString("0", inv)%</b></div>
+        <div class="card kpi"><small>Ingresos del mes</small><b>S/ @a.IngresosMes.ToString("N2", inv)</b><span>@a.PagosMes pago(s)</span></div>
+    </div>
+
+    <div class="card">
+        <strong>Estado de las habitaciones</strong>
+        <div class="chips" style="margin:12px 0 0">
+            <span class="chip"><b>@a.Habitaciones.Disponibles</b><small>Disponibles</small></span>
+            <span class="chip"><b>@a.Habitaciones.Ocupadas</b><small>Ocupadas</small></span>
+            <span class="chip"><b>@a.Habitaciones.Limpieza</b><small>En limpieza</small></span>
+            <span class="chip"><b>@a.Habitaciones.Mantenimiento</b><small>Mantenimiento</small></span>
+        </div>
+    </div>
+
+    <div class="botones">
+        <a class="btn-p" href="@Url.Action("Index", "Reportes")">Ver reportes</a>
+        <a class="btn-s" href="@Url.Action("Index", "Tarifas")">Tarifas</a>
+    </div>
+}
+else if (Model.Recepcion != null)
+{
+    var r = Model.Recepcion;
+
+    <div class="kpis">
+        <div class="card kpi"><small>Llegadas de hoy</small><b>@r.Llegadas.Count</b></div>
+        <div class="card kpi"><small>Salidas de hoy</small><b>@r.Salidas.Count</b></div>
+        <div class="card kpi"><small>Habitaciones disponibles</small><b>@r.Habitaciones.Disponibles / @r.Habitaciones.Total</b></div>
+        <div class="card kpi"><small>Por confirmar</small><b>@r.Pendientes</b></div>
+        <div class="card kpi"><small>Por cobrar</small><b>@r.PorCobrar</b></div>
+    </div>
+
+    <div class="dos">
+        <div>
+            <div class="cabecera" style="margin-bottom:8px">
+                <strong>Llegadas de hoy</strong>
+                <a class="btn-s" href="@Url.Action("Index", "Recepcion", new { fecha = hoyTxt })">Gestionar →</a>
+            </div>
+            @if (r.Llegadas.Count == 0)
+            {
+                <div class="card">No hay llegadas previstas para hoy.</div>
+            }
+            else
+            {
+                <div class="card tabla">
+                    <table>
+                        <thead><tr><th>N°</th><th>CLIENTE</th><th>HAB.</th><th>ESTADO</th></tr></thead>
+                        <tbody>
+                            @foreach (var x in r.Llegadas)
+                            {
+                                <tr>
+                                    <td><strong>#@x.IdReserva.ToString("D6")</strong></td>
+                                    <td>@x.Cliente</td>
+                                    <td>@x.Habitaciones</td>
+                                    <td><span class="pill @(x.Estado == "Confirmada" ? "p-ok" : "p-amb")">@x.Estado</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <div>
+            <div class="cabecera" style="margin-bottom:8px">
+                <strong>Salidas de hoy</strong>
+                <a class="btn-s" href="@Url.Action("Index", "Recepcion", new { estado = "CheckIn" })">Gestionar →</a>
+            </div>
+            @if (r.Salidas.Count == 0)
+            {
+                <div class="card">No hay salidas previstas para hoy.</div>
+            }
+            else
+            {
+                <div class="card tabla">
+                    <table>
+                        <thead><tr><th>N°</th><th>CLIENTE</th><th>HAB.</th><th>PAGO</th></tr></thead>
+                        <tbody>
+                            @foreach (var x in r.Salidas)
+                            {
+                                <tr>
+                                    <td><strong>#@x.IdReserva.ToString("D6")</strong></td>
+                                    <td>@x.Cliente</td>
+                                    <td>@x.Habitaciones</td>
+                                    <td><span class="pill @(x.Pagada ? "p-ok" : "p-amb")">@(x.Pagada ? "Pagada" : "Pendiente")</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}
+else if (Model.Cliente != null)
+{
+    var c = Model.Cliente;
+
+    <div class="cabecera">
+        <div>
+            <strong>@(c.Activas == 0 ? "No tienes estadías próximas" : "Tus próximas estadías")</strong>
+        </div>
+        <a class="btn-p" href="@Url.Action("Buscar", "Reserva")">+ Nueva reserva</a>
+    </div>
+
+    if (c.Proximas.Count == 0)
+    {
+        <div class="card">Todavía no tienes reservas activas. Busca una habitación y reserva en minutos.</div>
+    }
+    else
+    {
+        <div class="card tabla">
+            <table>
+                <thead><tr><th>N°</th><th>FECHAS</th><th>HABITACIONES</th><th>TOTAL</th><th>ESTADO</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var x in c.Proximas)
+                    {
+                        string clase = x.Estado == "Pendiente" ? "p-amb" : x.Estado == "Confirmada" ? "p-ok" : "p-azul";
+                        <tr>
+                            <td><strong>#@x.IdReserva.ToString("D6")</strong></td>
+                            <td>@x.Entrada.ToString("dd/MM/yyyy") – @x.Salida.ToString("dd/MM/yyyy")<br /><small>@x.Noches noche(s)</small></td>
+                            <td>@x.Habitaciones</td>
+                            <td>S/ @x.Total.ToString("N2", inv)</td>
+                            <td><span class="pill @clase">@x.Estado</span></td>
+                            <td class="acciones"><a class="btn-s" href="@Url.Action("Confirmacion", "Reserva", new { id = x.IdReserva })">Ver</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="botones">
+            <a class="btn-s" href="@Url.Action("MisReservas", "Reserva")">Ver todas mis reservas</a>
+        </div>
+    }
+}

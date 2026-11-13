@@ -131,6 +131,7 @@
     <Compile Include="Controllers\HabitacionesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RecepcionController.cs" />
+    <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Controllers\ReservaController.cs" />
     <Compile Include="Controllers\TarifasController.cs" />
     <Compile Include="Controllers\TemporadasController.cs" />
@@ -146,6 +147,7 @@
     <Compile Include="ViewModels\HabitacionViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\PagoViewModels.cs" />
+    <Compile Include="ViewModels\PanelViewModel.cs" />
     <Compile Include="ViewModels\RecepcionViewModels.cs" />
     <Compile Include="ViewModels\TarifasTemporadaViewModel.cs" />
     <Compile Include="ViewModels\TemporadaViewModel.cs" />
@@ -236,6 +238,10 @@
     <Content Include="Views\Reserva\Constancia.cshtml" />
     <Content Include="Views\Recepcion\Cobrar.cshtml" />
     <Content Include="Views\Recepcion\Pagos.cshtml" />
+    <Content Include="Views\Reportes\Index.cshtml" />
+    <Content Include="Views\Reportes\Ocupacion.cshtml" />
+    <Content Include="Views\Reportes\Ingresos.cshtml" />
+    <Content Include="Views\Reportes\PorEstado.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
