@@ -1,0 +1,37 @@
+﻿@model CapaPresentacion.ViewModels.HabitacionViewModel
+@{
+    bool nueva = Model.IdHabitacion == 0;
+    ViewBag.Titulo = nueva ? "Nueva habitación" : "Editar habitación";
+}
+<h1>@(nueva ? "Nueva habitación." : "Editar habitación.")</h1>
+<p class="sub">Los campos con * son obligatorios.</p>
+
+<div class="card form">
+    @using (Html.BeginForm("Guardar", "Habitaciones", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.IdHabitacion)
+        @Html.ValidationSummary(true)
+
+        @Html.LabelFor(m => m.NumeroHabitacion)
+        @Html.TextBoxFor(m => m.NumeroHabitacion, new { @class = "inp", maxlength = 10, autofocus = "autofocus" })
+        @Html.ValidationMessageFor(m => m.NumeroHabitacion)
+
+        @Html.LabelFor(m => m.Piso)
+        @Html.TextBoxFor(m => m.Piso, new { @class = "inp", type = "number", min = 1, max = 20 })
+        @Html.ValidationMessageFor(m => m.Piso)
+
+        @Html.LabelFor(m => m.IdTipoHabitacion)
+        @Html.DropDownListFor(m => m.IdTipoHabitacion, Model.Tipos, new { @class = "inp" })
+        @Html.ValidationMessageFor(m => m.IdTipoHabitacion)
+
+        @Html.LabelFor(m => m.IdEstadoHabitacion)
+        @Html.DropDownListFor(m => m.IdEstadoHabitacion, Model.Estados, new { @class = "inp" })
+        @Html.ValidationMessageFor(m => m.IdEstadoHabitacion)
+
+        <div class="botones">
+            <button type="submit" class="btn-p">Guardar</button>
+            <a class="btn-s" href="@Url.Action("Index")">Cancelar</a>
+        </div>
+    }
+</div>

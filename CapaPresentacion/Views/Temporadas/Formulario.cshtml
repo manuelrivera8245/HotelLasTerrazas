@@ -1,0 +1,33 @@
+﻿@model CapaPresentacion.ViewModels.TemporadaViewModel
+@{
+    bool nueva = Model.IdTemporada == 0;
+    ViewBag.Titulo = nueva ? "Nueva temporada" : "Editar temporada";
+}
+<h1>@(nueva ? "Nueva temporada." : "Editar temporada.")</h1>
+<p class="sub">Los campos con * son obligatorios.</p>
+
+<div class="card form">
+    @using (Html.BeginForm("Guardar", "Temporadas", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.IdTemporada)
+        @Html.ValidationSummary(true)
+
+        @Html.LabelFor(m => m.NombreTemporada)
+        @Html.TextBoxFor(m => m.NombreTemporada, new { @class = "inp", maxlength = 40, autofocus = "autofocus" })
+        @Html.ValidationMessageFor(m => m.NombreTemporada)
+
+        @Html.LabelFor(m => m.FechaInicio)
+        @Html.TextBoxFor(m => m.FechaInicio, "{0:yyyy-MM-dd}", new { @class = "inp", type = "date" })
+        @Html.ValidationMessageFor(m => m.FechaInicio)
+
+        @Html.LabelFor(m => m.FechaFin)
+        @Html.TextBoxFor(m => m.FechaFin, "{0:yyyy-MM-dd}", new { @class = "inp", type = "date" })
+        @Html.ValidationMessageFor(m => m.FechaFin)
+
+        <div class="botones">
+            <button type="submit" class="btn-p">Guardar</button>
+            <a class="btn-s" href="@Url.Action("Index")">Cancelar</a>
+        </div>
+    }
+</div>

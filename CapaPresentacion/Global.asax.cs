@@ -16,6 +16,18 @@ namespace CapaPresentacion
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            try
+            {
+                new CapaNegocio.UsuarioNegocio().PrepararUsuariosDemo();
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Usuarios demo: " + ex.Message);
+            }
         }
+
     }
+
 }
+

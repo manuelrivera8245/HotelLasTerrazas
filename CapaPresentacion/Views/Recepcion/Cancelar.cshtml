@@ -1,0 +1,31 @@
+﻿@model CapaPresentacion.ViewModels.CancelarRecepcionViewModel
+@{
+    ViewBag.Titulo = "Cancelar reserva";
+}
+<h1>Cancelar reserva.</h1>
+<p class="sub">La cancelación libera las habitaciones. Indica el motivo para dejar constancia.</p>
+
+<div class="card form">
+    <div class="fila-res"><span>Reserva</span><strong>#@Model.IdReserva.ToString("D6")</strong></div>
+    <div class="fila-res"><span>Cliente</span><strong>@Model.Cliente</strong></div>
+    <div class="fila-res"><span>Fechas</span><strong>@Model.Fechas</strong></div>
+    <div class="fila-res"><span>Habitaciones</span><strong>@Model.Habitaciones</strong></div>
+
+    @using (Html.BeginForm("Cancelar", "Recepcion", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.IdReserva)
+        @Html.HiddenFor(m => m.FiltroEstado)
+        @Html.HiddenFor(m => m.FiltroFecha)
+        @Html.ValidationSummary(true)
+
+        @Html.LabelFor(m => m.Motivo)
+        @Html.TextAreaFor(m => m.Motivo, 3, 40, new { @class = "inp", maxlength = 200, autofocus = "autofocus" })
+        @Html.ValidationMessageFor(m => m.Motivo)
+
+        <div class="botones">
+            <button type="submit" class="btn-p">Cancelar reserva</button>
+            <a class="btn-s" href="@Url.Action("Index", new { estado = Model.FiltroEstado, fecha = Model.FiltroFecha })">Volver sin cancelar</a>
+        </div>
+    }
+</div>

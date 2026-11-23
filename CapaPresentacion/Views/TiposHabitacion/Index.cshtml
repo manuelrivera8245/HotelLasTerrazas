@@ -1,0 +1,41 @@
+﻿@model List<CapaNegocio.TipoHabitacionFila>
+@{
+    ViewBag.Titulo = "Tipos de habitación";
+}
+<div class="cabecera">
+    <div>
+        <h1>Tipos de habitación.</h1>
+        <p class="sub">Individual, Doble, Suite y Familiar, con su capacidad y descripción.</p>
+    </div>
+    <a class="btn-p" href="@Url.Action("Crear")">+ Nuevo tipo</a>
+</div>
+
+<div class="card tabla">
+    <table>
+        <thead>
+            <tr><th>NOMBRE</th><th>CAPACIDAD</th><th>DESCRIPCIÓN</th><th>HABITACIONES</th><th>ESTADO</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td><strong>@t.NombreTipo</strong></td>
+                    <td>@t.Capacidad</td>
+                    <td>@t.Descripcion</td>
+                    <td>@t.CantHabitaciones</td>
+                    <td><span class="pill @(t.Estado ? "p-ok" : "p-off")">@(t.Estado ? "Activo" : "Inactivo")</span></td>
+                    <td class="acciones">
+                        <a class="btn-s" href="@Url.Action("Editar", new { id = t.IdTipoHabitacion })">Editar</a>
+                        @using (Html.BeginForm("Eliminar", "TiposHabitacion", FormMethod.Post,
+                            new { style = "display:inline", onsubmit = "return confirm('¿Eliminar este tipo de habitación?');" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@t.IdTipoHabitacion" />
+                            <button type="submit" class="btn-s peligro">Eliminar</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

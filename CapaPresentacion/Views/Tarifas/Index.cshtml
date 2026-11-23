@@ -1,0 +1,64 @@
+﻿@model CapaNegocio.MatrizTarifas
+@using System.Globalization
+@{
+    ViewBag.Titulo = "Tarifas";
+}
+<div class="cabecera">
+    <div>
+        <h1>Tarifas.</h1>
+        <p class="sub">Precio por noche de cada tipo de habitación en cada temporada. Cada combinación necesita su tarifa.</p>
+    </div>
+</div>
+
+@if (Model.Temporadas.Count == 0)
+{
+    <div class="warn">Todavía no hay temporadas. Crea una primero para poder poner precios.</div>
+    <a class="btn-p" href="@Url.Action("Index", "Temporadas")">Ir a Temporadas</a>
+}
+else
+{
+    if (Model.Faltan > 0)
+    {
+        <div class="warn">
+            Faltan <strong>@Model.Faltan</strong> tarifa(s). Mientras falten, esos tipos de habitación no se podrán reservar en esas temporadas.
+        </div>
+    }
+
+    <div class="card tabla">
+        <table class="matriz">
+            <thead>
+                <tr>
+                    <th>TIPO</th>
+                    @foreach (var t in Model.Temporadas)
+                    {
+                        <th>
+                            @t.NombreTemporada
+                            <span class="fechas">@t.FechaInicio.ToString("dd/MM") – @t.FechaFin.ToString("dd/MM/yyyy")</span>
+                            <a class="btn-s" href="@Url.Action("Editar", new { id = t.IdTemporada })">Editar precios</a>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tipo in Model.Tipos)
+                {
+                    <tr>
+                        <td><strong>@tipo.Texto</strong></td>
+                        @foreach (var t in Model.Temporadas)
+                        {
+                            var p = Model.Precio(tipo.Id, t.IdTemporada);
+                            if (p.HasValue)
+                            {
+                                <td class="precio">S/ @p.Value.ToString("N2", CultureInfo.InvariantCulture)</td>
+                            }
+                            else
+                            {
+                                <td><span class="pill p-amb">Falta</span></td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

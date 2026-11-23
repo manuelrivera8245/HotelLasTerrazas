@@ -1,0 +1,70 @@
+﻿@model CapaPresentacion.ViewModels.LoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bienvenido · Las Terrazas</title>
+    <link href="@CapaPresentacion.Helpers.EstiloHelper.Hotel()" rel="stylesheet" />
+</head>
+<body>
+    <div class="login-wrap">
+        <div class="login-card">
+            <section class="login-brand">
+                <div class="logo">LT<span><b>LAS TERRAZAS</b><small>HOTEL · AREQUIPA</small></span></div>
+                <div>
+                    <div class="eyebrow">HOSPITALIDAD, BIEN ORGANIZADA</div>
+                    <h1>Cada estadía comienza aquí.</h1>
+                    <p>Reservas claras. Habitaciones listas. Más tiempo para tus huéspedes.</p>
+                </div>
+                <small>Gestión de hospedaje · Avance académico</small>
+            </section>
+
+            <section class="login-form">
+                <div class="eyebrow">TU HOTEL, EN UN SOLO LUGAR</div>
+                <h2>Bienvenido de nuevo</h2>
+                <p class="sub">Ingresa para continuar con tu jornada.</p>
+
+                @if (TempData["Ok"] != null)
+                {
+                    <div class="ok">@TempData["Ok"]</div>
+                }
+
+                @using (Html.BeginForm("Login", "Cuenta", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                    @Html.ValidationSummary(true)
+
+                    @Html.LabelFor(m => m.Correo)
+                    @Html.TextBoxFor(m => m.Correo, new { @class = "inp", autofocus = "autofocus", autocomplete = "username" })
+                    @Html.ValidationMessageFor(m => m.Correo)
+
+                    @Html.LabelFor(m => m.Clave)
+                    @Html.PasswordFor(m => m.Clave, new { @class = "inp", autocomplete = "current-password" })
+                    @Html.ValidationMessageFor(m => m.Clave)
+
+                    <button type="submit" class="btn-main">Iniciar sesión →</button>
+                }
+
+                <p class="enlaces">
+                    ¿Primera visita? <a href="@Url.Action("Registro", "Cuenta")">Crear cuenta de cliente</a>
+                    · <a href="@Url.Action("Index", "Inicio")">Volver al inicio</a>
+                </p>
+
+                <details class="demo">
+                    <summary>Cuentas para la demostración</summary>
+                    <table>
+                        <tr><td>Administrador</td><td>admin@hotellasterrazas.com</td><td>Admin123*</td></tr>
+                        <tr><td>Recepcionista</td><td>recepcion@hotellasterrazas.com</td><td>Recep123*</td></tr>
+                        <tr><td>Cliente</td><td>jperez@gmail.com</td><td>Cliente123*</td></tr>
+                    </table>
+                </details>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

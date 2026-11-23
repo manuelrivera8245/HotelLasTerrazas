@@ -1,0 +1,11 @@
+﻿@model CapaNegocio.ComprobanteDetalle
+@{
+    ViewBag.Titulo = "Comprobante";
+}
+@Html.Partial("_Constancia", Model)
+
+<div class="botones no-print">
+    <button type="button" class="btn-p" onclick="window.print()">Imprimir / guardar PDF</button>
+    <a class="btn-s" href="@Url.Action("Index")">Volver a reservas</a>
+    <a class="btn-s" href="@Url.Action("Pagos")">Historial de pagos</a>
+</div>
