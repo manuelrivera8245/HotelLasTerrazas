@@ -19,6 +19,14 @@ namespace CapaPresentacion.Helpers
             return VirtualPathUtility.ToAbsolute(rel);
         }
 
+        public static string Hotel(string nombre)
+        {
+            string rel = "~/Content/img/hotel/" + nombre + ".webp";
+            string fisica = HostingEnvironment.MapPath(rel);
+            if (fisica == null || !File.Exists(fisica)) return null;
+            return VirtualPathUtility.ToAbsolute(rel);
+        }
+
         private static string Slug(string texto)
         {
             string d = (texto ?? "").Trim().ToLowerInvariant().Normalize(NormalizationForm.FormD);

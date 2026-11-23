@@ -130,6 +130,7 @@
     <Compile Include="Controllers\CuentaController.cs" />
     <Compile Include="Controllers\HabitacionesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\InicioController.cs" />
     <Compile Include="Controllers\RecepcionController.cs" />
     <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Controllers\ReservaController.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helper\EstiloHelper.cs" />
     <Compile Include="Helper\FotoHelper.cs" />
     <Compile Include="Helper\MenuHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -149,6 +151,7 @@
     <Compile Include="ViewModels\PagoViewModels.cs" />
     <Compile Include="ViewModels\PanelViewModel.cs" />
     <Compile Include="ViewModels\RecepcionViewModels.cs" />
+    <Compile Include="ViewModels\RegistroViewModel.cs" />
     <Compile Include="ViewModels\TarifasTemporadaViewModel.cs" />
     <Compile Include="ViewModels\TemporadaViewModel.cs" />
     <Compile Include="ViewModels\TipoHabitacionViewModel.cs" />
@@ -194,6 +197,12 @@
     <Content Include="Content\img\hotel\exterior.webp" />
     <Content Include="Content\img\hotel\recepcion.webp" />
     <Content Include="Content\img\hotel\terraza.webp" />
+    <Content Include="Content\img\hotel\vista-aerea.webp" />
+    <Content Include="Content\img\hotel\vista-derecha.webp" />
+    <Content Include="Content\img\hotel\vista-frente.webp" />
+    <Content Include="Content\img\hotel\vista-izquierda.webp" />
+    <Content Include="Content\img\hotel\vista-lateral.webp" />
+    <Content Include="Content\img\hotel\vista-posterior.webp" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -242,6 +251,8 @@
     <Content Include="Views\Reportes\Ocupacion.cshtml" />
     <Content Include="Views\Reportes\Ingresos.cshtml" />
     <Content Include="Views\Reportes\PorEstado.cshtml" />
+    <Content Include="Views\Cuenta\Registro.cshtml" />
+    <Content Include="Views\Inicio\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

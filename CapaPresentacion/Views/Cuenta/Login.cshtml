@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Bienvenido · Las Terrazas</title>
-    <link href="~/Content/hotel.css" rel="stylesheet" />
+    <link href="@CapaPresentacion.Helpers.EstiloHelper.Hotel()" rel="stylesheet" />
 </head>
 <body>
     <div class="login-wrap">
@@ -28,6 +28,11 @@
                 <h2>Bienvenido de nuevo</h2>
                 <p class="sub">Ingresa para continuar con tu jornada.</p>
 
+                @if (TempData["Ok"] != null)
+                {
+                    <div class="ok">@TempData["Ok"]</div>
+                }
+
                 @using (Html.BeginForm("Login", "Cuenta", FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
@@ -44,6 +49,11 @@
 
                     <button type="submit" class="btn-main">Iniciar sesión →</button>
                 }
+
+                <p class="enlaces">
+                    ¿Primera visita? <a href="@Url.Action("Registro", "Cuenta")">Crear cuenta de cliente</a>
+                    · <a href="@Url.Action("Index", "Inicio")">Volver al inicio</a>
+                </p>
 
                 <details class="demo">
                     <summary>Cuentas para la demostración</summary>

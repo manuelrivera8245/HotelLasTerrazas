@@ -1,0 +1,200 @@
+﻿@model List<CapaNegocio.TipoLanding>
+@using System.Globalization
+@using System.Linq
+@using CapaPresentacion.Helpers
+@{
+    Layout = null;
+    var inv = CultureInfo.InvariantCulture;
+    string exterior = FotoHelper.Hotel("exterior");
+
+    var vistas = new[] { "vista-derecha", "vista-frente", "vista-lateral", "vista-izquierda", "vista-aerea" }
+        .Select(n => FotoHelper.Hotel(n)).Where(u => u != null).ToList();
+
+    var galeria = new[]
+    {
+        new { Foto = FotoHelper.Hotel("terraza"), Texto = "Terraza jardín", Alt = "Terraza jardín con vista al volcán Misti" },
+        new { Foto = FotoHelper.Hotel("recepcion"), Texto = "Recepción", Alt = "Recepción con mostrador de madera clara" },
+        new { Foto = FotoHelper.Hotel("desayuno"), Texto = "Desayuno", Alt = "Comedor de desayuno luminoso" }
+    }.Where(g => g.Foto != null).ToList();
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hotel Las Terrazas · Arequipa</title>
+    <link href="@CapaPresentacion.Helpers.EstiloHelper.Hotel()" rel="stylesheet" />
+</head>
+<body class="pub">
+
+    <header class="pub-nav">
+        <div class="logo">LT<span><b>LAS TERRAZAS</b><small>HOTEL · AREQUIPA</small></span></div>
+        <nav>
+            <a href="#habitaciones">Habitaciones</a>
+            <a href="#hotel">El hotel</a>
+            <a href="@Url.Action("Login", "Cuenta")">Iniciar sesión</a>
+            <a class="btn-dor" href="@Url.Action("Registro", "Cuenta")">Crear cuenta</a>
+        </nav>
+    </header>
+
+    <section class="pub-hero">
+        <div>
+            <div class="eyebrow">HOSPITALIDAD, BIEN ORGANIZADA</div>
+            <h1>Cada estadía comienza aquí.</h1>
+            <p>Consulta disponibilidad, elige una o varias habitaciones y recibe la confirmación del hotel.</p>
+            <div class="pub-cta">
+                <a class="btn-dor" href="@Url.Action("Buscar", "Reserva")">Reservar ahora</a>
+                <a class="btn-ghost" href="#habitaciones">Ver habitaciones</a>
+            </div>
+        </div>
+        <div class="arch-foto">
+            @if (exterior != null)
+            {
+                <img src="@exterior" alt="Fachada del Hotel Las Terrazas con el volcán Misti al fondo" />
+            }
+            else
+            {
+                <span aria-hidden="true">LT</span>
+            }
+        </div>
+    </section>
+
+    <section class="pub-sec" id="habitaciones">
+        <h2>Nuestras habitaciones</h2>
+        <p class="sub">El precio por noche depende de la temporada.</p>
+        <div class="pub-grid">
+            @foreach (var t in Model)
+            {
+                string foto = FotoHelper.Habitacion(t.Nombre);
+                <article class="pub-card">
+                    <div class="pub-foto">
+                        @if (foto != null)
+                        {
+                            <img src="@foto" alt="Habitación @t.Nombre" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="pub-sin">@t.Nombre</div>
+                        }
+                    </div>
+                    <div class="pub-info">
+                        <h3>@t.Nombre</h3>
+                        <p>@t.Descripcion</p>
+                        <small>Hasta @t.Capacidad huésped(es)</small>
+                        <div class="pub-precio">
+                            @if (t.Desde.HasValue)
+                            {
+                                <small>Desde</small> <span>S/ @t.Desde.Value.ToString("N2", inv)</span> <small>/ noche</small>
+                            }
+                            else
+                            {
+                                <small>Consulta las tarifas</small>
+                            }
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+
+    <section class="pub-sec" id="hotel">
+        <h2>Conoce el hotel</h2>
+        <p class="sub">Un edificio de líneas simples, terrazas con plantas y vista al volcán Misti.</p>
+
+        @if (vistas.Count > 0)
+        {
+            <div class="carr" id="carr" role="region" aria-roledescription="carrusel" aria-label="Vistas del hotel">
+                @for (int i = 0; i < vistas.Count; i++)
+                {
+                    <img class="carr-img @(i == 0 ? "on" : "")" src="@vistas[i]" alt="Vista @(i + 1) del edificio del hotel" @(i == 0 ? "" : "loading=lazy") />
+                }
+                @if (vistas.Count > 1)
+                {
+                    <button type="button" class="carr-btn carr-prev" aria-label="Vista anterior">‹</button>
+                    <button type="button" class="carr-btn carr-next" aria-label="Vista siguiente">›</button>
+                    <div class="carr-pts">
+                        @for (int i = 0; i < vistas.Count; i++)
+                        {
+                            <button type="button" class="carr-pto @(i == 0 ? "on" : "")" aria-label="Ir a la vista @(i + 1)"></button>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @if (galeria.Count > 0)
+        {
+            <div class="pub-gal">
+                @foreach (var g in galeria)
+                {
+                    <figure>
+                        <img src="@g.Foto" alt="@g.Alt" loading="lazy" />
+                        <figcaption>@g.Texto</figcaption>
+                    </figure>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="pub-sec">
+        <h2>Reservar es simple</h2>
+        <div class="pasos">
+            <div class="card paso"><b>1</b><strong>Elige tus fechas</strong><p>Indica entrada, salida y tipo de habitación.</p></div>
+            <div class="card paso"><b>2</b><strong>Selecciona habitaciones</strong><p>Puedes reservar una o varias en la misma reserva.</p></div>
+            <div class="card paso"><b>3</b><strong>Recibe la confirmación</strong><p>Recepción confirma tu reserva y registra tu pago.</p></div>
+        </div>
+    </section>
+
+    <section class="pub-band">
+        <h2>¿Listo para tu estadía?</h2>
+        <p>Crea tu cuenta gratis y reserva en minutos.</p>
+        <div class="pub-cta" style="justify-content:center;margin-bottom:0">
+            <a class="btn-dor" href="@Url.Action("Registro", "Cuenta")">Crear cuenta</a>
+            <a class="btn-ghost" href="@Url.Action("Login", "Cuenta")">Ya tengo cuenta</a>
+        </div>
+    </section>
+
+    <footer class="pub-foot">Hotel Las Terrazas · Arequipa, Perú · Proyecto académico de Desarrollo de Software II</footer>
+
+    <script>
+        (function () {
+            const raiz = document.getElementById('carr');
+            if (!raiz) return;
+            const fotos = raiz.querySelectorAll('.carr-img');
+            const puntos = raiz.querySelectorAll('.carr-pto');
+            const ant = raiz.querySelector('.carr-prev');
+            const sig = raiz.querySelector('.carr-next');
+            if (fotos.length < 2 || !ant || !sig) return;
+
+            const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let actual = 0;
+            let timer = null;
+
+            function ir(n) {
+                fotos[actual].classList.remove('on');
+                puntos[actual].classList.remove('on');
+                puntos[actual].removeAttribute('aria-current');
+                actual = (n + fotos.length) % fotos.length;
+                fotos[actual].classList.add('on');
+                puntos[actual].classList.add('on');
+                puntos[actual].setAttribute('aria-current', 'true');
+            }
+            function parar() { if (timer) { clearInterval(timer); timer = null; } }
+            function auto() {
+                parar();
+                if (!reducido) timer = setInterval(function () { ir(actual + 1); }, 5000);
+            }
+
+            ant.addEventListener('click', function () { ir(actual - 1); auto(); });
+            sig.addEventListener('click', function () { ir(actual + 1); auto(); });
+            puntos.forEach(function (p, i) { p.addEventListener('click', function () { ir(i); auto(); }); });
+            raiz.addEventListener('mouseenter', parar);
+            raiz.addEventListener('mouseleave', auto);
+            raiz.addEventListener('focusin', parar);
+            raiz.addEventListener('focusout', auto);
+            puntos[0].setAttribute('aria-current', 'true');
+            auto();
+        })();
+    </script>
+</body>
+</html>
