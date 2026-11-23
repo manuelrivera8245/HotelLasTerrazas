@@ -1,5 +1,6 @@
 ﻿@model CapaPresentacion.ViewModels.PanelViewModel
 @using System.Globalization
+@using System.Collections.Generic
 @{
     ViewBag.Titulo = "Inicio";
     var inv = CultureInfo.InvariantCulture;
@@ -13,6 +14,46 @@
 @if (Model.Admin != null)
 {
     var a = Model.Admin;
+
+    // ---- Datos preparados para la vista (solo presentación) ----
+    var colorEstado = new Dictionary<string, string>
+{
+        { "Pendiente", "#e0b878" },
+        { "Confirmada", "#28594b" },
+        { "CheckIn", "#5b8fb0" },
+        { "CheckOut", "#9fb8ad" },
+        { "Cancelada", "#c46a5e" }
+    };
+    var pillEstado = new Dictionary<string, string>
+{
+        { "Pendiente", "p-amb" },
+        { "Confirmada", "p-ok" },
+        { "CheckIn", "p-azul" },
+        { "CheckOut", "p-off" },
+        { "Cancelada", "p-rojo" }
+    };
+
+    decimal ant = a.IngresosMesAnterior;
+    string dTxt;
+    string dCls;
+    if (ant > 0)
+    {
+        decimal pct = (a.IngresosMes - ant) / ant * 100m;
+        dTxt = pct.ToString("+0;-0;0", inv) + "% vs mes anterior";
+        dCls = pct > 0 ? "sube" : (pct < 0 ? "baja" : "igual");
+    }
+    else
+    {
+        dTxt = a.IngresosMes > 0 ? "Sin mes anterior para comparar" : "Sin ingresos aún";
+        dCls = "igual";
+    }
+
+    string etqSemana = string.Join("|", a.IngresosSemana.Select(x => x.Etiqueta));
+    string valSemana = string.Join(",", a.IngresosSemana.Select(x => x.Monto.ToString("0.00", inv)));
+    int totalReservas = a.ReservasPorEstado.Sum(x => x.Cantidad);
+    string etqEstado = string.Join("|", a.ReservasPorEstado.Select(x => x.Estado));
+    string valEstado = string.Join(",", a.ReservasPorEstado.Select(x => x.Cantidad));
+    string colEstado = string.Join("|", a.ReservasPorEstado.Select(x => colorEstado.ContainsKey(x.Estado) ? colorEstado[x.Estado] : "#b5b5b5"));
 
     if (a.TarifasFaltan > 0)
     {
@@ -29,28 +70,191 @@
         </div>
     }
 
-    <div class="kpis">
-        <div class="card kpi"><small>Habitaciones disponibles</small><b>@a.Habitaciones.Disponibles / @a.Habitaciones.Total</b></div>
-        <div class="card kpi"><small>Llegadas de hoy</small><b>@a.LlegadasHoy</b></div>
-        <div class="card kpi"><small>Reservas por confirmar</small><b>@a.Pendientes</b></div>
-        <div class="card kpi"><small>Ocupación de hoy</small><b>@a.OcupacionHoy.ToString("0", inv)%</b></div>
-        <div class="card kpi"><small>Ingresos del mes</small><b>S/ @a.IngresosMes.ToString("N2", inv)</b><span>@a.PagosMes pago(s)</span></div>
-    </div>
-
-    <div class="card">
-        <strong>Estado de las habitaciones</strong>
-        <div class="chips" style="margin:12px 0 0">
-            <span class="chip"><b>@a.Habitaciones.Disponibles</b><small>Disponibles</small></span>
-            <span class="chip"><b>@a.Habitaciones.Ocupadas</b><small>Ocupadas</small></span>
-            <span class="chip"><b>@a.Habitaciones.Limpieza</b><small>En limpieza</small></span>
-            <span class="chip"><b>@a.Habitaciones.Mantenimiento</b><small>Mantenimiento</small></span>
+    <!-- ===== KPIs ===== -->
+    <div class="dash-kpis">
+        <div class="dash-kpi">
+            <div class="dash-ico"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /></svg></div>
+            <small>Habitaciones disponibles</small>
+            <b>@a.Habitaciones.Disponibles / @a.Habitaciones.Total</b>
+        </div>
+        <div class="dash-kpi">
+            <div class="dash-ico azul"><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M10 17l5-5-5-5" /><path d="M15 12H3" /></svg></div>
+            <small>Llegadas de hoy</small>
+            <b>@a.LlegadasHoy</b>
+        </div>
+        <div class="dash-kpi">
+            <div class="dash-ico ambar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg></div>
+            <small>Reservas por confirmar</small>
+            <b>@a.Pendientes</b>
+        </div>
+        <div class="dash-kpi">
+            <div class="dash-ico oro"><svg viewBox="0 0 24 24"><path d="M4 20V10" /><path d="M10 20V4" /><path d="M16 20v-7" /><path d="M22 20H2" /></svg></div>
+            <small>Ocupación de hoy</small>
+            <b>@a.OcupacionHoy.ToString("0", inv)%</b>
+        </div>
+        <div class="dash-kpi">
+            <div class="dash-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 6v2m0 8v2" /><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.4 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1 0-2-.5-2.5-1.5" /></svg></div>
+            <small>Ingresos del mes</small>
+            <b>S/ @a.IngresosMes.ToString("N2", inv)</b>
+            <span>@a.PagosMes pago(s)</span>
+            <span class="dash-delta @dCls">@dTxt</span>
         </div>
     </div>
 
-    <div class="botones">
-        <a class="btn-p" href="@Url.Action("Index", "Reportes")">Ver reportes</a>
-        <a class="btn-s" href="@Url.Action("Index", "Tarifas")">Tarifas</a>
+    <!-- ===== Gráficos ===== -->
+    <div class="dash-grid">
+        <div class="dash-card">
+            <div class="dash-card-cab">
+                <strong>Ingresos de los últimos 7 días</strong>
+                <a href="@Url.Action("Index", "Reportes")">Ver reportes →</a>
+            </div>
+            <div class="dash-chart">
+                <canvas id="dashIngresos" data-etq="@etqSemana" data-val="@valSemana"></canvas>
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-cab"><strong>Reservas por estado</strong></div>
+            @if (totalReservas == 0)
+            {
+                <div class="dash-chart-dona"><div class="dash-vacio">Aún no hay reservas registradas.</div></div>
+            }
+            else
+            {
+                <div class="dash-chart-dona">
+                    <canvas id="dashEstados" data-etq="@etqEstado" data-val="@valEstado" data-col="@colEstado"></canvas>
+                    <div class="dash-dona-centro"><div><b>@totalReservas</b><small>reservas</small></div></div>
+                </div>
+                <div class="dash-leyenda">
+                    @foreach (var e in a.ReservasPorEstado)
+                    {
+                        <span><i style="background:@(colorEstado.ContainsKey(e.Estado) ? colorEstado[e.Estado] : "#b5b5b5")"></i>@e.Estado (@e.Cantidad)</span>
+                    }
+                </div>
+            }
+        </div>
     </div>
+
+    <!-- ===== Reservas recientes y habitaciones ===== -->
+    <div class="dash-grid">
+        <div class="dash-card">
+            <div class="dash-card-cab">
+                <strong>Reservas recientes</strong>
+                <a href="@Url.Action("Index", "Reportes")">Ver reportes →</a>
+            </div>
+            @if (a.Recientes.Count == 0)
+            {
+                <div class="dash-vacio" style="height:120px">Todavía no hay reservas.</div>
+            }
+            else
+            {
+                <div class="tabla">
+                    <table>
+                        <thead><tr><th>N°</th><th>CLIENTE</th><th>HAB.</th><th>FECHAS</th><th>ESTADO</th><th>TOTAL</th></tr></thead>
+                        <tbody>
+                            @foreach (var x in a.Recientes)
+                            {
+                                <tr>
+                                    <td><strong>#@x.IdReserva.ToString("D6")</strong></td>
+                                    <td>@x.Cliente</td>
+                                    <td>@x.Habitaciones</td>
+                                    <td>@x.Entrada.ToString("dd/MM") – @x.Salida.ToString("dd/MM/yyyy")</td>
+                                    <td><span class="pill @(pillEstado.ContainsKey(x.Estado) ? pillEstado[x.Estado] : "p-off")">@x.Estado</span></td>
+                                    <td>S/ @x.Monto.ToString("N2", inv)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-cab"><strong>Estado de las habitaciones</strong></div>
+            <div class="dash-hab">
+                <div><b>@a.Habitaciones.Disponibles</b><small>Disponibles</small></div>
+                <div><b>@a.Habitaciones.Ocupadas</b><small>Ocupadas</small></div>
+                <div><b>@a.Habitaciones.Limpieza</b><small>En limpieza</small></div>
+                <div><b>@a.Habitaciones.Mantenimiento</b><small>Mantenimiento</small></div>
+            </div>
+            <div class="dash-ocup">
+                <div class="fila"><span>Ocupación de hoy</span><b>@a.OcupacionHoy.ToString("0", inv)%</b></div>
+                <div class="pbar"><i style="width:@(a.OcupacionHoy.ToString("0", inv))%"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Accesos rápidos ===== -->
+    <div class="dash-card" style="margin-bottom:20px">
+        <div class="dash-card-cab"><strong>Accesos rápidos</strong></div>
+        <div class="dash-acciones">
+            <a class="dash-accion dash-accion-prim" href="@Url.Action("Index", "Reportes")">
+                <span class="dash-ico"><svg viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z" /><path d="M14 3v6h6" /></svg></span>Ver reportes
+            </a>
+            <a class="dash-accion" href="@Url.Action("Index", "Tarifas")">
+                <span class="dash-ico oro"><svg viewBox="0 0 24 24"><path d="M20 12l-8 8-9-9V3h8z" /><circle cx="7.5" cy="7.5" r="1.2" /></svg></span>Tarifas
+            </a>
+            <a class="dash-accion" href="@Url.Action("Index", "Temporadas")">
+                <span class="dash-ico azul"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg></span>Temporadas
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+                (function () {
+                    if (typeof Chart === 'undefined') return;
+                    Chart.defaults.font.family = '"Segoe UI", system-ui, sans-serif';
+                    Chart.defaults.color = '#5b6a65';
+
+                    var ing = document.getElementById('dashIngresos');
+                    if (ing) {
+                        var etq = ing.getAttribute('data-etq').split('|');
+                        var val = ing.getAttribute('data-val').split(',').map(Number);
+                        new Chart(ing, {
+                            type: 'line',
+                            data: {
+                                labels: etq,
+                                datasets: [{
+                                    label: 'Ingresos (S/)',
+                                    data: val,
+                                    borderColor: '#28594b',
+                                    backgroundColor: 'rgba(40,89,75,0.12)',
+                                    fill: true,
+                                    tension: 0.35,
+                                    pointRadius: 4,
+                                    pointBackgroundColor: '#28594b'
+                                }]
+                            },
+                            options: {
+                                maintainAspectRatio: false,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    y: { beginAtZero: true, grid: { color: '#e8ece9' }, ticks: { callback: function (v) { return 'S/ ' + v; } } },
+                                    x: { grid: { display: false } }
+                                }
+                            }
+                        });
+                    }
+
+                    var est = document.getElementById('dashEstados');
+                    if (est) {
+                        new Chart(est, {
+                            type: 'doughnut',
+                            data: {
+                                labels: est.getAttribute('data-etq').split('|'),
+                                datasets: [{
+                                    data: est.getAttribute('data-val').split(',').map(Number),
+                                    backgroundColor: est.getAttribute('data-col').split('|'),
+                                    borderWidth: 2,
+                                    borderColor: '#ffffff'
+                                }]
+                            },
+                            options: { maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false } } }
+                        });
+                    }
+                })();
+    </script>
 }
 else if (Model.Recepcion != null)
 {

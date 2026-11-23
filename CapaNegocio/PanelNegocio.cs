@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 using CapaDatos;
 
 namespace CapaNegocio
@@ -25,6 +26,30 @@ namespace CapaNegocio
         public bool Pagada { get; set; }
     }
 
+    public class PuntoIngreso
+    {
+        public string Etiqueta { get; set; }
+        public decimal Monto { get; set; }
+    }
+
+    public class PuntoEstado
+    {
+        public string Estado { get; set; }
+        public int Cantidad { get; set; }
+    }
+
+    public class ReservaReciente
+    {
+        public int IdReserva { get; set; }
+        public string Cliente { get; set; }
+        public string Habitaciones { get; set; }
+        public DateTime Entrada { get; set; }
+        public DateTime Salida { get; set; }
+        public string Estado { get; set; }
+        public decimal Monto { get; set; }
+        public bool Pagada { get; set; }
+    }
+
     public class PanelAdmin
     {
         public PanelHabitaciones Habitaciones { get; set; }
@@ -35,6 +60,19 @@ namespace CapaNegocio
         public decimal OcupacionHoy { get; set; }
         public int TarifasFaltan { get; set; }
         public int HuecosTemporada { get; set; }
+
+        // Nuevos (solo lectura, para el panel)
+        public decimal IngresosMesAnterior { get; set; }
+        public List<PuntoIngreso> IngresosSemana { get; set; }
+        public List<PuntoEstado> ReservasPorEstado { get; set; }
+        public List<ReservaReciente> Recientes { get; set; }
+
+        public PanelAdmin()
+        {
+            IngresosSemana = new List<PuntoIngreso>();
+            ReservasPorEstado = new List<PuntoEstado>();
+            Recientes = new List<ReservaReciente>();
+        }
     }
 
     public class PanelRecepcion
@@ -84,6 +122,69 @@ namespace CapaNegocio
                 var pagos = db.Pago.Where(x => x.FechaPago >= iniMes && x.FechaPago < finMes);
                 p.IngresosMes = pagos.Select(x => (decimal?)x.Monto).Sum() ?? 0m;
                 p.PagosMes = pagos.Count();
+
+                // ---- Nuevos datos del panel (solo lectura) ----
+                DateTime iniMesAnt = iniMes.AddMonths(-1);
+                p.IngresosMesAnterior = db.Pago
+                    .Where(x => x.FechaPago >= iniMesAnt && x.FechaPago < iniMes)
+                    .Select(x => (decimal?)x.Monto).Sum() ?? 0m;
+
+                // Ingresos de los últimos 7 días (se agrupa en memoria)
+                DateTime desde = hoy.AddDays(-6);
+                DateTime hasta = hoy.AddDays(1);
+                var pagosSemana = db.Pago
+                    .Where(x => x.FechaPago >= desde && x.FechaPago < hasta)
+                    .Select(x => new { x.FechaPago, x.Monto })
+                    .ToList();
+                var es = new CultureInfo("es-PE");
+                for (int i = 0; i < 7; i++)
+                {
+                    DateTime d = desde.AddDays(i);
+                    p.IngresosSemana.Add(new PuntoIngreso
+                    {
+                        Etiqueta = d.ToString("ddd d", es),
+                        Monto = pagosSemana.Where(x => x.FechaPago.Date == d).Sum(x => x.Monto)
+                    });
+                }
+
+                // Reservas por estado
+                var estados = db.Reserva
+                    .GroupBy(r => r.EstadoReserva.NombreEstado)
+                    .Select(g => new { Estado = g.Key, N = g.Count() })
+                    .ToList();
+                string[] orden = { "Pendiente", "Confirmada", "CheckIn", "CheckOut", "Cancelada" };
+                p.ReservasPorEstado = estados
+                    .OrderBy(x => Array.IndexOf(orden, x.Estado))
+                    .Select(x => new PuntoEstado { Estado = x.Estado, Cantidad = x.N })
+                    .ToList();
+
+                // Últimas 6 reservas
+                var rec = db.Reserva
+                    .OrderByDescending(r => r.IdReserva)
+                    .Take(6)
+                    .Select(r => new
+                    {
+                        r.IdReserva,
+                        Cliente = r.Cliente.Nombres + " " + r.Cliente.Apellidos,
+                        r.FechaEntrada,
+                        r.FechaSalida,
+                        Estado = r.EstadoReserva.NombreEstado,
+                        r.MontoTotal,
+                        Habs = r.DetalleReserva.Select(x => x.Habitacion.NumeroHabitacion),
+                        Pagada = r.Pago.Any()
+                    }).ToList();
+
+                p.Recientes = rec.Select(x => new ReservaReciente
+                {
+                    IdReserva = x.IdReserva,
+                    Cliente = x.Cliente,
+                    Habitaciones = string.Join(", ", x.Habs.OrderBy(h => h)),
+                    Entrada = x.FechaEntrada,
+                    Salida = x.FechaSalida,
+                    Estado = x.Estado,
+                    Monto = x.MontoTotal,
+                    Pagada = x.Pagada
+                }).ToList();
             }
 
             p.OcupacionHoy = new ReportesNegocio().Ocupacion(hoy, hoy).Porcentaje;
